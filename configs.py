@@ -9,13 +9,13 @@ device = "cpu"
 
 
 # Scenarios
-num_envs = 1
+num_envs = 40
 n_jobs = 3
 n_tasks = n_jobs**2
 n_machines = 4 #+1 the Cloud entity
 
 #Experiments #epocs
-max_updates = 1
+max_updates = 300
 
 # Instance generator
 task_time_low = 3

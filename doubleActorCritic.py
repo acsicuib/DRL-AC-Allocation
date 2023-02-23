@@ -29,8 +29,7 @@ class ActorCritic(nn.Module):
     
     def forward(self, state_ft,state_fm, candidate, mask, adj, graph_pool):
     # def act(self, state, candidate, mask, adj, graph_pool):
-
-        print("state_shape",state_ft.shape)
+        # print("state_shape",state_ft.shape)
         # Split the state from env        
         # fts_x, fts_hw = torch.split(state, configs.n_tasks*configs.n_jobs)
         fts_x = state_ft
@@ -57,32 +56,34 @@ class ActorCritic(nn.Module):
         mask_reshape = mask.reshape(candidate_scores.size())
         candidate_scores[mask_reshape] = float('-inf')
         pi = F.softmax(candidate_scores, dim=1)
-        ttt = pi.squeeze()
         dist = Categorical(pi.squeeze())
-        s = dist.sample()
-        dist_logprob = dist.log_prob(s)
+        task_ix_sample = dist.sample()
+        dist_logprob = dist.log_prob(task_ix_sample)
         v = self.critic(h_pooled) #TODO CRITIC?
 
-        ## III. Placement part 
-        elem = torch.full(size=(1, fts_hw.shape[1],configs.n_tasks*(configs.r_n_feat-1)),fill_value=0,dtype=torch.float32)
+        ## III. Placement part
+        fthw_c =  fts_hw.reshape(candidate.size(0), configs.n_machines+1, 2) #TODO number of hw features
+        elem = torch.full(size=(candidate.size(0), configs.n_machines+1, configs.n_tasks*(configs.r_n_feat-1)),fill_value=0,dtype=torch.float32)
+        # elem = torch.full(size=(1, fts_hw.shape[1],configs.n_tasks*(configs.r_n_feat-1)),fill_value=0,dtype=torch.float32)
         
         for e,task in enumerate(fts_x):
-            lm = (e//(configs.n_tasks))*(configs.n_machines+1)
-            ix_machine = int(task[-1])+lm
+            lm = (e//(configs.n_tasks))
+            ix_machine = int(task[-1])
             task_pos = (e*2)%((configs.n_tasks)*2)
-            elem[0][ix_machine][task_pos:task_pos+1]=task[:1] #TODO HW features 
+            elem[lm][ix_machine][task_pos:task_pos+1]=task[:1] #TODO HW features 
 
-        concateHWFea = torch.cat((fts_hw, elem), dim=-1)
-        
+
+        concateHWFea = torch.cat((fthw_c, elem), dim=-1)
+       
         machine_scores = self.actorPL(concateHWFea)
         mhi = F.softmax(machine_scores, dim=1)
-        xxx = mhi.squeeze()
         distMH = Categorical(mhi.squeeze())
         machineID = distMH.sample()
         distMH_logprob = distMH.log_prob(machineID)
-        vm = self.criticPL(concateHWFea) #TODO CRITIC?
+        vm = self.criticPL(concateHWFea).squeeze(2) #TODO CRITIC?
+        vm = torch.min(vm,1,).values #TODO Alert -> Reduciendo 5 accioens a 1 con la peor probabilidad. Note IV
 
-        return candidate.squeeze()[s], v, dist_logprob.detach(),machineID, vm, distMH_logprob.detach()
+        return candidate.squeeze()[task_ix_sample], task_ix_sample, pi, v, dist_logprob.detach(), machineID, mhi, vm, distMH_logprob.detach()
         
    
 

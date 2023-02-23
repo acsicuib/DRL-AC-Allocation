@@ -13,6 +13,13 @@ import sys
 
 device = torch.device(configs.device)
 
+def eval_actions(p,ix_actions):
+        softmax_dist = Categorical(p)
+        ret = softmax_dist.log_prob(ix_actions).reshape(-1)
+        entropy = softmax_dist.entropy().mean()
+        return ret, entropy
+
+
 class Memory:
     def __init__(self):
         self.alloc_mb = []
@@ -23,8 +30,8 @@ class Memory:
         self.state_fm = []
         self.candidate_mb = []
         self.mask_mb = []
-        self.a_mb = []#action_task
-        self.am_mb = [] #action_ machine
+        self.a_mb = [] #action_idx_task
+        self.am_mb = [] #action_idx_machine
         self.reward_mb = []
         self.done_mb = []
         self.logprobs = []
@@ -56,11 +63,13 @@ class PPO:
         # self.buffer = RolloutBuffer()
 
         self.policy = ActorCritic(state_dim,device)
-        self.optimizer = torch.optim.Adam([
-                        {'params': self.policy.actor.parameters(), 'lr': configs.lr_agent},
-                        {'params': self.policy.critic.parameters(), 'lr': configs.lr_critic}
-                    ])
+        # self.optimizer = torch.optim.Adam([
+        #                 {'params': self.policy.actor.parameters(), 'lr': configs.lr_agent},
+        #                 {'params': self.policy.critic.parameters(), 'lr': configs.lr_critic}
+        #             ])
 
+        self.optimizer = torch.optim.Adam(self.policy.parameters(), lr=configs.lr_agent)
+    
         self.policy_old =  deepcopy(self.policy)
 
         self.policy_old.load_state_dict(self.policy.state_dict())
@@ -70,6 +79,7 @@ class PPO:
 
         self.MseLoss = nn.MSELoss()
         
+
 
     def update(self,memories):
         vloss_coef = configs.vloss_coef
@@ -143,7 +153,7 @@ class PPO:
                 #     masks=mask_mb_t_all_env[i]
                 #     )
                 
-                task_action, vals, log_taskprob, machine_action, valsm, log_machprob = self.policy(
+                task_action, ix_action, pis, vals, log_taskprob, machine_action, mhis, valsm, log_machprob = self.policy(
                     state_ft=state_ft_all_env[i],
                     state_fm=state_fm_all_env[i],
                     candidate=candidate_mb_t_all_env[i],
@@ -151,25 +161,40 @@ class PPO:
                     adj=adj_mb_t_all_env[i],
                     graph_pool=mb_g_pool
                 )
-
+                logprobs, ent_loss = eval_actions(pis.squeeze(),a_mb_t_all_env[i])
+                logprobs_m, ent_loss_m = eval_actions(mhis.squeeze(),am_mb_t_all_env[i])
                 # match state_values tensor dimensions with rewards tensor
-                state_values = torch.squeeze(state_values)
+                # state_values = torch.squeeze(state_values)
 
                 # logprobs, ent_loss = eval_actions(pis.squeeze(), a_mb_t_all_env[i])
                 ratios = torch.exp(logprobs - old_logprobs_mb_t_all_env[i].detach())
+                ratios_m = torch.exp(logprobs_m - old_logprobs_m_mb_t_all_env[i].detach())
+                
+                advantages_t = rewards_all_env[i] - vals.view(-1).detach()
+                advantages_m = rewards_all_env[i] - valsm.view(-1).detach() #TODO. Note IV
                 
                 # Finding Surrogate Loss
-                advantages = rewards - state_values.detach()   
-                surr1 = ratios * advantages
-                surr2 = torch.clamp(ratios, 1-self.eps_clip, 1+self.eps_clip) * advantages
+                # advantages = rewards - state_values.detach()   
+                surr1t = ratios * advantages_t
+                surr2t = torch.clamp(ratios, 1 - self.eps_clip, 1 + self.eps_clip) * advantages_t
+                surr1m = ratios_m * advantages_m
+                surr2m = torch.clamp(ratios_m, 1 - self.eps_clip, 1 + self.eps_clip) * advantages_m
 
                 # final loss of clipped objective PPO
-                v_loss = self.MseLoss(state_values, rewards_all_env[i])
-                p_loss = - torch.min(surr1, surr2).mean()
-                dist_entropy_loss = - dist_entropy_loss.clone()
-                loss = vloss_coef * v_loss + ploss_coef * p_loss + entloss_coef * dist_entropy_loss
-                loss_sum += loss
-                vloss_sum += v_loss
+                v_losst = self.MseLoss(vals.squeeze(), rewards_all_env[i])
+                v_lossm = self.MseLoss(valsm.squeeze(), rewards_all_env[i])
+
+                p_losst = - torch.min(surr1t, surr2t).mean()
+                p_lossm = - torch.min(surr1m, surr2m).mean()
+
+                # dist_entropy_loss = - dist_entropy_loss.clone()
+                ent_loss = - ent_loss.clone()
+                ent_loss_m = - ent_loss_m.clone()
+
+                losst = vloss_coef * v_losst + ploss_coef * p_losst + entloss_coef * ent_loss
+                lossm = vloss_coef * v_lossm + ploss_coef * p_lossm + entloss_coef * ent_loss_m
+                loss_sum += (losst+lossm)/2.
+                vloss_sum += (v_lossm+v_losst)/2.
            
             # x = loss_sum.mean().clone().to(torch.float64)
             self.optimizer.zero_grad()

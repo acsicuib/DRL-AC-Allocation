@@ -86,7 +86,7 @@ def main():
                     # state = torch.cat((feat_task_tensor_envs[i].reshape(-1),feat_mach_tensor_envs[i].reshape(-1)))
                     # state = state.type(torch.float)
 
-                    task_action, _, log_taskprob, machine_action, _, log_machprob = ppo_agent.policy_old(
+                    task_action, ix_task_action, _, _, logProb, ix_machine_action, _, _, logProb_m = ppo_agent.policy_old(
                                                                 state_ft=state_ft_tensor_envs[i],
                                                                 state_fm=state_fm_tensor_envs[i].unsqueeze(0),
                                                                 candidate=candidate_tensor_envs[i].unsqueeze(0),
@@ -97,10 +97,12 @@ def main():
                     # print(action)
                     # print(a_idx)
                     task_action_envs.append(task_action)
-                    m_action_envs.append(machine_action)
-                    
-                    task_idx_envs.append(log_taskprob)
-                    m_idx_envs.append(log_machprob)
+                    task_idx_envs.append(ix_task_action) 
+                    m_idx_envs.append(ix_machine_action)
+
+                    memories[i].logprobs.append(logProb)
+                    memories[i].logprobs_m.append(logProb_m)
+                    # m_idx_envs.append(log_machprob)
 
             alloc_envs = []
             state_ft_envs = []
@@ -113,7 +115,7 @@ def main():
 
             # Saving episode data
             for i in range(configs.num_envs):
-                memories[i].adj_mb.append(adj_tensor_envs[i])
+                memories[i].adj_mb.append(adj_tensor_envs[i]) #TODO Purge memories
                 memories[i].alloc_mb.append(alloc_tensor_envs[i])
                 memories[i].state_ft.append(state_ft_tensor_envs[i])
                 memories[i].state_fm.append(state_fm_tensor_envs[i])
@@ -121,13 +123,12 @@ def main():
                 # memories[i].featMach.append(feat_mach_tensor_envs[i])
                 memories[i].candidate_mb.append(candidate_tensor_envs[i])
                 memories[i].mask_mb.append(mask_tensor_envs[i])
-                memories[i].a_mb.append(task_action_envs[i]) #clean both vars.
-                memories[i].am_mb.append(m_action_envs[i]) #clean both vars.
-                memories[i].logprobs.append(task_idx_envs[i])
-                memories[i].logprobs_m.append(m_idx_envs[i])
+                memories[i].a_mb.append(task_idx_envs[i]) #clean both vars.
+                memories[i].am_mb.append(m_idx_envs[i]) #clean both vars.
+                
 
                 alloc, state, reward, done, candidate, mask = envs[i].step(task=int(task_action_envs[i]),
-                                                                           machine=int(m_action_envs[i]))
+                                                                           machine=int(m_idx_envs[i]))
                 
 
                 alloc_envs.append(alloc)
@@ -158,16 +159,16 @@ def main():
         for memory in memories:
             memory.clear_memory()
        
-        # mean_rewards_all_env = sum(ep_rewards) / len(ep_rewards)
-        # mean_all_init_rewards =  init_rewards.mean()
-        # log.append([i_update, mean_rewards_all_env,v_loss,mean_all_init_rewards])
-        # print('Episode {}\t Last reward: {:.2f}\t Mean_Vloss: {:.8f}\t Init reward: {:.2f}'.format(i_update + 1, mean_rewards_all_env, v_loss, mean_all_init_rewards))
+        mean_rewards_all_env = sum(ep_rewards) / len(ep_rewards)
+        mean_all_init_rewards =  init_rewards.mean()
+        log.append([i_update, mean_rewards_all_env,v_loss,mean_all_init_rewards])
+        print('Episode {}\t Last reward: {:.2f}\t Mean_Vloss: {:.8f}\t Init reward: {:.2f}'.format(i_update + 1, mean_rewards_all_env, v_loss, mean_all_init_rewards))
     
         ## DEBUG with out PPO Agent -. 
-        mean_rewards_all_env = ep_rewards.mean() # mean of the c-n time 
-        mean_all_init_rewards =  init_rewards.mean()
-        log.append([i_update, mean_rewards_all_env, mean_all_init_rewards])
-        print('Episode {}\t Last reward: {:.2f} \t Init reward: {:.2f}'.format(i_update + 1, mean_rewards_all_env, mean_all_init_rewards))
+        # mean_rewards_all_env = ep_rewards.mean() # mean of the c-n time 
+        # mean_all_init_rewards =  init_rewards.mean()
+        # log.append([i_update, mean_rewards_all_env, mean_all_init_rewards])
+        # print('Episode {}\t Last reward: {:.2f} \t Init reward: {:.2f}'.format(i_update + 1, mean_rewards_all_env, mean_all_init_rewards))
 
     with open('trainlogs/log_ppo_train_' + str(configs.n_jobs) + '_' + str(configs.n_machines) + '_' + str(configs.task_time_low) + '_' + str(configs.task_time_high)+'.pkl', 'wb') as f:
         pickle.dump(log, f)
