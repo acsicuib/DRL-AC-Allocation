@@ -29,7 +29,7 @@ class ActorCritic(nn.Module):
     
     def forward(self, state_ft,state_fm, candidate, mask, adj, graph_pool):
     # def act(self, state, candidate, mask, adj, graph_pool):
-        # print("state_shape",state_ft.shape)
+        # print("state_shape",state_ft.shape)p
         # Split the state from env        
         # fts_x, fts_hw = torch.split(state, configs.n_tasks*configs.n_jobs)
         fts_x = state_ft

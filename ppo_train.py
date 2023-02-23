@@ -42,6 +42,7 @@ def main():
     
     # training loop
     log = []
+    logAlloc = []
     for i_update in range(configs.max_updates):
         
         #TODO clean vars -> state 
@@ -148,11 +149,12 @@ def main():
                 break
 
         
-        if i_update in [0,20,40,100]:
+        if i_update in [0,5,10,20]:
             print("Final placement: ",i_update)
             print(" -"*30)
             for i in range(configs.num_envs): # Makespan
-                print(i,envs[i].opIDsOnMchs)
+                print(i,envs[i].opIDsOnMchs,envs[i].feat_copy[envs[i].opIDsOnMchs][:,0],envs[i].feat_copy[envs[i].opIDsOnMchs][:,2])
+                logAlloc.append([i,envs[i].opIDsOnMchs.tolist(),envs[i].feat_copy[envs[i].opIDsOnMchs][:,0].tolist(),envs[i].feat_copy[envs[i].opIDsOnMchs][:,2].tolist()])
         # sys.exit()
 
         for j in range(configs.num_envs): # Makespan
@@ -176,6 +178,9 @@ def main():
 
     with open('trainlogs/log_ppo_train_' + str(configs.n_jobs) + '_' + str(configs.n_machines) + '_' + str(configs.task_time_low) + '_' + str(configs.task_time_high)+'.pkl', 'wb') as f:
         pickle.dump(log, f)
+
+    with open('trainlogs/log_alloc_train_' + str(configs.n_jobs) + '_' + str(configs.n_machines) + '_' + str(configs.task_time_low) + '_' + str(configs.task_time_high)+'.pkl', 'wb') as f:
+        pickle.dump(logAlloc, f)
 
 if __name__ == '__main__':
     print("PPO Experiment")

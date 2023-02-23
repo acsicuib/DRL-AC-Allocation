@@ -1,6 +1,8 @@
-    # try:
-    #     adj[3][1] = 1
-    #     adj[8][1] = 1
-    # except IndexError:
-    #     print("Warning. Assigning arcs among tasks. TODO")
-    # ##
+,  1.,  5.,  4.,],
+ [ 2.,  3.,  5.,  4.,],
+ [ 6.,  3., 10.,  4.,],
+ [ 2.,  3.,  1.,  4.,],
+ [10.,  1., 30., 10.,]])
+
+print(fw)
+print(fw[i][0])

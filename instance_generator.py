@@ -3,15 +3,15 @@ from DAG_app_generator import generate_DAG_application
 import configs
 
 
-def one_instance_gen(n_jobs,n_machines,cloud_features=configs.cloud_features):
+def one_instance_gen(n_jobs,n_machines,cloud_features=configs.cloud_features,dependency_degree=configs.DAG_rand_dependencies_factor):
 
-    times, adj = generate_DAG_application(n_jobs,configs.task_time_low,configs.task_time_high)
+    times, adj = generate_DAG_application(n_jobs,configs.task_time_low,configs.task_time_high,degree=dependency_degree)
     n_features = len(configs.feat_labels)
     
     feat_Speed = np.random.choice(configs.cpu_speed,n_machines)
     feat_Cost = np.random.choice(configs.cost_options,n_machines)
     feat_Lat = np.random.choice(configs.latency_options,n_machines)
-    feat_Load = np.repeat([n_features],n_machines) #TODO
+    feat_Load = np.repeat([n_features],n_machines) #TODO HW features
     # feat_LoadPena = np.zeros(n_machines)  
     # feat = np.concatenate((feat_HW,feat_Cost,feat_Lat,feat_Load,feat_LoadPena)).reshape(n_features,n_machines).T
     
