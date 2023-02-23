@@ -36,8 +36,8 @@ def main():
     #TODO R-III fix size bazth =tasks
     # +- Prioridad de cada tarea 
     g_pool_step = g_pool_cal(graph_pool_type=configs.graph_pool_type,
-                             batch_size=torch.Size([1, 9, 9]),#TODO. el 9 representará el servicio asignado a cada nodo. Todos los pesos iniciales por igual.
-                             n_nodes=9,
+                             batch_size=torch.Size([1, configs.n_tasks, configs.n_tasks]),#TODO. el 9 representará el servicio asignado a cada nodo. Todos los pesos iniciales por igual.
+                             n_nodes=configs.n_tasks,
                              device=device)
     
     # training loop
@@ -147,9 +147,13 @@ def main():
                 assert steps == envs[0].step_count
                 break
 
-        # print("Final placement")   
-        # for i in range(configs.num_envs): # Makespan
-        #     print(i,envs[i].opIDsOnMchs)
+        
+        if i_update in [0,20,40,100]:
+            print("Final placement: ",i_update)
+            print(" -"*30)
+            for i in range(configs.num_envs): # Makespan
+                print(i,envs[i].opIDsOnMchs)
+        # sys.exit()
 
         for j in range(configs.num_envs): # Makespan
             ep_rewards[j] -= envs[j].posRewards # same actions/states as the initial maximum goal state
