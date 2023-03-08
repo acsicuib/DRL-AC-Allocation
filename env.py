@@ -93,8 +93,8 @@ class SPP(gym.Env, EzPickle): #Service Placement Problem
         for col in range(2): #TODO fix definitive number of features
             featureMachines[:,col] /= np.abs(featureMachines[:,col]).max()
 
-        # print("FT",featuresTasks.shape)
-        # print("FM",featureMachines.shape)
+        #print("FT",featuresTasks.shape)
+        #print("FM",featureMachines.shape)
         
         # state = np.concatenate((featuresTasks.reshape(-1),featureMachines.reshape(-1)),dtype=np.float32)
 

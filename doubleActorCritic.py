@@ -6,11 +6,12 @@ from torch.distributions import Categorical
 from graphcnn import GraphCNN
 import configs
 import torch.nn.functional as F
-
+import sys
 
 class ActorCritic(nn.Module):
 
     def __init__(self,state_dim,device):
+        # super().__init__()
         super(ActorCritic, self).__init__()
         self.feature_extract = GraphCNN(num_layers=configs.num_layers,
                                         num_mlp_layers=configs.num_mlp_layers_feature_extract,
@@ -34,7 +35,8 @@ class ActorCritic(nn.Module):
         # fts_x, fts_hw = torch.split(state, configs.n_tasks*configs.n_jobs)
         fts_x = state_ft
         fts_hw = state_fm
-        
+        print(fts_x.shape)
+        sys.exit()
         # fts_x = fts_x.reshape(configs.n_tasks,configs.n_jobs)
         
         # I. Pooling nodes for scheduler part

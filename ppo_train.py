@@ -15,6 +15,9 @@ from mb_agg import g_pool_cal
 device = torch.device(configs.device)
 
 
+from torchviz import make_dot
+from torchinfo import summary
+
 
 def main():
     #TODO clean old vars
@@ -31,8 +34,13 @@ def main():
 
     # initialize a PPO agent
     ppo_agent = PPO(envs[0].state_dim)
+    print(ppo_agent.policy.named_parameters())
+    # print(ppo_agent.policy)
 
-    
+    make_dot(memories,params=dict(ppo_agent.policy.named_parameters()), show_attrs=True, show_saved=True)
+
+    sys.exit()
+
     #TODO R-III fix size bazth =tasks
     # +- Prioridad de cada tarea 
     g_pool_step = g_pool_cal(graph_pool_type=configs.graph_pool_type,
@@ -149,7 +157,8 @@ def main():
                 break
 
         
-        if i_update in [0,5,10,20]:
+        # if i_update in [0,5,10,20]:
+        if i_update in [0,10,20,40]:
             print("Final placement: ",i_update)
             print(" -"*30)
             for i in range(configs.num_envs): # Makespan
@@ -176,10 +185,10 @@ def main():
         # log.append([i_update, mean_rewards_all_env, mean_all_init_rewards])
         # print('Episode {}\t Last reward: {:.2f} \t Init reward: {:.2f}'.format(i_update + 1, mean_rewards_all_env, mean_all_init_rewards))
 
-    with open('trainlogs/log_ppo_train_' + str(configs.n_jobs) + '_' + str(configs.n_machines) + '_' + str(configs.task_time_low) + '_' + str(configs.task_time_high)+'.pkl', 'wb') as f:
-        pickle.dump(log, f)
+    # with open('trainlogs/log_ppo_c15_train_' + str(configs.n_jobs) + '_' + str(configs.n_machines) + '_' + str(configs.task_time_low) + '_' + str(configs.task_time_high)+'.pkl', 'wb') as f:
+    #     pickle.dump(log, f)
 
-    with open('trainlogs/log_alloc_train_' + str(configs.n_jobs) + '_' + str(configs.n_machines) + '_' + str(configs.task_time_low) + '_' + str(configs.task_time_high)+'.pkl', 'wb') as f:
+    with open('trainlogs/log_alloc_c15_v2_train_' + str(configs.n_jobs) + '_' + str(configs.n_machines) + '_' + str(configs.task_time_low) + '_' + str(configs.task_time_high)+'.pkl', 'wb') as f:
         pickle.dump(logAlloc, f)
 
 if __name__ == '__main__':
