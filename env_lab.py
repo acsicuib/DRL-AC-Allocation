@@ -1,11 +1,8 @@
-import numpy as np
+from parameters import configs
 from env import SPP
-from DAG_app_generator import generate_DAG_application 
-import time
-import sys
-
 from instance_generator import one_instance_gen
-import configs
+import numpy as np
+import time
 
 
 def main():
@@ -13,17 +10,17 @@ def main():
     np.random.seed(SEED)
 
     n_jobs = configs.n_jobs 
-    n_machines = configs.n_machines
-    n_features = configs.n_feat
+    n_devices = configs.n_devices
+    n_features = len(configs.feature_labels)
 
-    times, adj, feat = one_instance_gen(n_jobs,n_machines)
+    times, adj, feat = one_instance_gen(n_jobs,n_devices,configs.cloud_features,configs.DAG_rand_dependencies_factor)
     print("HW features: ",feat)
     print(feat)
 
     t1 = time.time()
 
     # Environment
-    env = SPP(number_jobs=n_jobs,number_machines=n_machines,number_features=n_features)
+    env = SPP(number_jobs=n_jobs,number_devices=n_devices,number_features=n_features)
 
     print("Reset environment")
     alloc, state, omega, mask = env.reset(times,adj,feat)
@@ -48,10 +45,10 @@ def main():
         ix_job = np.random.choice(len(omega[~mask]))
         candidate_task = omega[~mask][ix_job]
         print("Candidate_job: ",candidate_task)
-        machine = env.selectRndMachine()
-        print('Action:', machine)
+        device = env.selectRndDevice()
+        print('Action:', device)
 
-        alloc, state, reward, done, omega, mask = env.step(candidate_task,machine)
+        alloc, state, reward, done, omega, mask = env.step(candidate_task,device)
         rewards.append(reward)
         print("Post alloc by task")
         print(env.opIDsOnMchs)

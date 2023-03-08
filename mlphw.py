@@ -81,7 +81,7 @@ class MLPHW(nn.Module):
 
 if __name__ == '__main__':
     import configs
-    from mb_agg import g_pool_cal
+    from dag_aggregate import g_pool_cal
     device = torch.device(configs.device)
 
     model = MLPHW(configs.num_layers,

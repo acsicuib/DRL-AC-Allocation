@@ -15,7 +15,7 @@ from instance_generator import one_instance_gen
 def main():
     np.random.seed(configs.np_seed_train)
  
-    envs = [SPP(number_jobs=configs.n_jobs, number_machines=configs.n_machines,number_features=configs.n_feat) for _ in range(configs.num_envs)]
+    envs = [SPP(number_jobs=configs.n_jobs, number_devices=configs.n_machines,number_features=configs.n_feat) for _ in range(configs.num_envs)]
     data_generator = one_instance_gen
   
     # training loop
@@ -29,7 +29,7 @@ def main():
         
         # Init all the environments
         for i, env in enumerate(envs):
-            _, _, candidate, mask = env.reset(*data_generator(n_jobs=configs.n_jobs, n_machines=configs.n_machines))
+            _, _, candidate, mask = env.reset(*data_generator(n_jobs=configs.n_jobs, n_devices=configs.n_machines))
 
             candidate_envs.append(candidate)
             mask_envs.append(mask)
@@ -46,7 +46,7 @@ def main():
                 # V0. select rnd action. Version amigable
                 ix_job = np.random.choice(len(candidate_envs[i][~mask_envs[i]]))
                 candidate_task = candidate_envs[i][~mask_envs[i]][ix_job]
-                machine = envs[i].selectRndMachine()
+                machine = envs[i].selectRndDevice()
 
                 # V1. 1º Cualquiera sin los candidatos y posteriormente aplicando candidatos (modelo ppo_train.py)  # V1. 1º Cualquier sin los candidatos 
                 ### NO FUNCIONA - hay que aplicar el candidate
@@ -61,7 +61,7 @@ def main():
             # Saving episode data
             for i in range(configs.num_envs):
                 _, _, reward, _, candidate, mask = envs[i].step(task=action_envs[i][0],
-                                                                machine=action_envs[i][1])
+                                                                device=action_envs[i][1])
 
                 candidate_envs.append(candidate)
                 mask_envs.append(mask)

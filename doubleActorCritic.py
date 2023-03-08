@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 from torch.distributions import Categorical
 from graphcnn import GraphCNN
-import configs
+from parameters import configs
 import torch.nn.functional as F
 import sys
 
@@ -17,28 +17,20 @@ class ActorCritic(nn.Module):
                                         num_mlp_layers=configs.num_mlp_layers_feature_extract,
                                         input_dim=configs.input_dim,
                                         hidden_dim=configs.hidden_dim,
-                                        learn_eps=configs.learn_eps,
                                         neighbor_pooling_type=configs.neighbor_pooling_type,
                                         device=device).to(device)
         
         self.actor  = MLPActor(num_layers=configs.num_mlp_layers_actor,  input_dim=configs.hidden_dim*2, hidden_dim=configs.hidden_dim_actor,  output_dim=1).to(device)
         self.critic = MLPCritic(configs.num_mlp_layers_critic,configs.hidden_dim, configs.hidden_dim_critic, 1).to(device) #NOTE alert! 
         
-        self.actorPL  = MLPActor(num_layers=configs.num_mlp_layers_actor,  input_dim=configs.input_dim_PL, hidden_dim=configs.hidden_dim_actor,  output_dim=1).to(device)
-        self.criticPL = MLPCritic(configs.num_mlp_layers_critic, input_dim=configs.input_dim_PL, hidden_dim=configs.hidden_dim_critic,output_dim=1).to(device) #NOTE alert! 
+        self.actorPL  = MLPActor(num_layers=configs.num_mlp_layers_actor,  input_dim=configs.input_dim_device, hidden_dim=configs.hidden_dim_actor,  output_dim=1).to(device)
+        self.criticPL = MLPCritic(configs.num_mlp_layers_critic, input_dim=configs.input_dim_device, hidden_dim=configs.hidden_dim_critic,output_dim=1).to(device) #NOTE alert! 
 
     
     def forward(self, state_ft,state_fm, candidate, mask, adj, graph_pool):
-    # def act(self, state, candidate, mask, adj, graph_pool):
-        # print("state_shape",state_ft.shape)p
-        # Split the state from env        
-        # fts_x, fts_hw = torch.split(state, configs.n_tasks*configs.n_jobs)
         fts_x = state_ft
         fts_hw = state_fm
-        print(fts_x.shape)
-        sys.exit()
-        # fts_x = fts_x.reshape(configs.n_tasks,configs.n_jobs)
-        
+   
         # I. Pooling nodes for scheduler part
         h_pooled, h_nodes = self.feature_extract(x=fts_x,
                                                  graph_pool=graph_pool,
@@ -64,44 +56,30 @@ class ActorCritic(nn.Module):
         v = self.critic(h_pooled) #TODO CRITIC?
 
         ## III. Placement part
-        fthw_c =  fts_hw.reshape(candidate.size(0), configs.n_machines+1, 2) #TODO number of hw features
-        elem = torch.full(size=(candidate.size(0), configs.n_machines+1, configs.n_tasks*(configs.r_n_feat-1)),fill_value=0,dtype=torch.float32)
+        fthw_c =  fts_hw.reshape(candidate.size(0), configs.n_devices+1, 2) #TODO number of hw features
+        elem = torch.full(size=(candidate.size(0), configs.n_devices+1, configs.n_tasks*(configs.r_n_feat-1)),fill_value=0,dtype=torch.float32)
         # elem = torch.full(size=(1, fts_hw.shape[1],configs.n_tasks*(configs.r_n_feat-1)),fill_value=0,dtype=torch.float32)
         
         for e,task in enumerate(fts_x):
             lm = (e//(configs.n_tasks))
-            ix_machine = int(task[-1])
+            ix_device = int(task[-1])
             task_pos = (e*2)%((configs.n_tasks)*2)
-            elem[lm][ix_machine][task_pos:task_pos+1]=task[:1] #TODO HW features 
+            elem[lm][ix_device][task_pos:task_pos+1]=task[:1] #TODO HW features 
 
 
         concateHWFea = torch.cat((fthw_c, elem), dim=-1)
        
-        machine_scores = self.actorPL(concateHWFea)
-        mhi = F.softmax(machine_scores, dim=1)
+        device_scores = self.actorPL(concateHWFea)
+        mhi = F.softmax(device_scores, dim=1)
         distMH = Categorical(mhi.squeeze())
-        machineID = distMH.sample()
-        distMH_logprob = distMH.log_prob(machineID)
+        device_ID = distMH.sample()
+        distMH_logprob = distMH.log_prob(device_ID)
         vm = self.criticPL(concateHWFea).squeeze(2) #TODO CRITIC?
         vm = torch.min(vm,1,).values #TODO Alert -> Reduciendo 5 accioens a 1 con la peor probabilidad. Note IV
 
-        return candidate.squeeze()[task_ix_sample], task_ix_sample, pi, v, dist_logprob.detach(), machineID, mhi, vm, distMH_logprob.detach()
+        return candidate.squeeze()[task_ix_sample], task_ix_sample, pi, v, dist_logprob.detach(), device_ID, mhi, vm, distMH_logprob.detach()
         
-   
 
-    ## V3
-    ## ACT() Comment 
-    ##
-
-    # def act(self, state, candidate, mask):
-    #     action_probs = self.actor(state)
-    #     action_probs = F.softmax(action_probs, dim=0) #TODO V2 Move it to MLP
-    #     dist = Categorical(action_probs)
-    #     action = dist.sample()
-    #     action_logprob = dist.log_prob(action)
-    #     return candidate[action], action_logprob.detach() # V3
-    ##     return action.detach(), action_logprob.detach() #V1 & V2
-   
 
     def evaluate(self, states, actions, candidates, masks):
         # print("EVAL")

@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from mlp import MLP
-import configs
+# from parameters import configs
 import numpy as np
 # import sys
 # sys.path.append("models/")
@@ -15,7 +15,7 @@ class GraphCNN(nn.Module):
                  input_dim,
                  hidden_dim,
                  # final_dropout,
-                 learn_eps,
+                #  learn_eps,
                  neighbor_pooling_type,
                  device):
         '''
@@ -36,7 +36,7 @@ class GraphCNN(nn.Module):
         self.device = device
         self.num_layers = num_layers
         self.neighbor_pooling_type = neighbor_pooling_type
-        self.learn_eps = learn_eps
+
         # common out the eps if you do not need to use it, otherwise the it will cause
         # error "not in the computational graph"
         # if self.learn_eps:
@@ -116,15 +116,7 @@ class GraphCNN(nn.Module):
 
         for layer in range(self.num_layers-1):
             # print("\tLayer ",layer)
-
-            if self.neighbor_pooling_type == "max" and self.learn_eps:
-                h = self.next_layer_eps(h, layer, padded_neighbor_list=padded_neighbor_list)
-            elif not self.neighbor_pooling_type == "max" and self.learn_eps:
-                h = self.next_layer_eps(h, layer, Adj_block=Adj_block)
-            elif self.neighbor_pooling_type == "max" and not self.learn_eps:
-                h = self.next_layer(h, layer, padded_neighbor_list=padded_neighbor_list)
-            elif not self.neighbor_pooling_type == "max" and not self.learn_eps:
-                h = self.next_layer(h, layer, Adj_block=Adj_block)
+            h = self.next_layer(h, layer, Adj_block=Adj_block)
 
         h_nodes = h.clone()
 

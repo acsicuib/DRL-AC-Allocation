@@ -1,52 +1,46 @@
 import os
+import sys
 import glob
 import time
-from datetime import datetime
-import configs
 import torch
 import numpy as np
+import pickle
+from datetime import datetime
+
+from parameters import configs
 from env import *
 from ppo import PPO, Memory
-# from optimizer import 
-import pickle
-import sys
 from instance_generator import one_instance_gen
-from mb_agg import g_pool_cal
+from dag_aggregate import dag_pool
+
 device = torch.device(configs.device)
 
-
-from torchviz import make_dot
-from torchinfo import summary
-
-
 def main():
+
+    print("Running case: ",configs.name)
+    print("\t tasks: ",configs.n_tasks)
+    print("\t devices: ",configs.n_devices)
+    print("\t episodes: ",configs.max_updates)
+
+
     #TODO clean old vars
     torch.manual_seed(configs.torch_seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(configs.torch_seed)
     np.random.seed(configs.np_seed_train)
     
- 
-    envs = [SPP(number_jobs=configs.n_jobs, number_machines=configs.n_machines,number_features=configs.n_feat) for _ in range(configs.num_envs)]
-    data_generator = one_instance_gen
+    number_all_device_features = len(configs.feature_labels) #TODO fix 
+    envs = [SPP(number_jobs=configs.n_jobs, number_devices=configs.n_devices,number_features=number_all_device_features) for _ in range(configs.num_envs)]
  
     memories = [Memory() for _ in range(configs.num_envs)]
 
     # initialize a PPO agent
     ppo_agent = PPO(envs[0].state_dim)
-    print(ppo_agent.policy.named_parameters())
     # print(ppo_agent.policy)
 
-    make_dot(memories,params=dict(ppo_agent.policy.named_parameters()), show_attrs=True, show_saved=True)
-
-    sys.exit()
-
-    #TODO R-III fix size bazth =tasks
-    # +- Prioridad de cada tarea 
-    g_pool_step = g_pool_cal(graph_pool_type=configs.graph_pool_type,
-                             batch_size=torch.Size([1, configs.n_tasks, configs.n_tasks]),#TODO. el 9 representará el servicio asignado a cada nodo. Todos los pesos iniciales por igual.
-                             n_nodes=configs.n_tasks,
-                             device=device)
+    dag_pool_step = dag_pool(graph_pool_type=configs.graph_pool_type,
+                             batch_size=torch.Size([1, configs.n_tasks, configs.n_tasks]),
+                             n_nodes=configs.n_tasks, device=device)
     
     # training loop
     log = []
@@ -65,7 +59,7 @@ def main():
 
         # Init all the environments
         for i, env in enumerate(envs):
-            alloc, state, candidate, mask = env.reset(*data_generator(n_jobs=configs.n_jobs, n_machines=configs.n_machines))
+            alloc, state, candidate, mask = env.reset(*one_instance_gen(n_jobs=configs.n_jobs, n_devices=configs.n_devices,cloud_features=configs.cloud_features, dependency_degree=configs.DAG_rand_dependencies_factor))
             adj_envs.append(env.adj)
             alloc_envs.append(alloc)
             state_ft_envs.append(state[0])
@@ -101,7 +95,7 @@ def main():
                                                                 candidate=candidate_tensor_envs[i].unsqueeze(0),
                                                                 mask=mask_tensor_envs[i].unsqueeze(0),
                                                                 adj=adj_tensor_envs[i],
-                                                                graph_pool=g_pool_step)
+                                                                graph_pool=dag_pool_step)
                  
                     # print(action)
                     # print(a_idx)
@@ -137,7 +131,7 @@ def main():
                 
 
                 alloc, state, reward, done, candidate, mask = envs[i].step(task=int(task_action_envs[i]),
-                                                                           machine=int(m_idx_envs[i]))
+                                                                           device=int(m_idx_envs[i]))
                 
 
                 alloc_envs.append(alloc)
@@ -158,13 +152,12 @@ def main():
 
         
         # if i_update in [0,5,10,20]:
-        if i_update in [0,10,20,40]:
-            print("Final placement: ",i_update)
-            print(" -"*30)
+        if i_update in configs.record_alloc_episodes:
+            # print("Final placement: ",i_update)
+            # print(" -"*30)
             for i in range(configs.num_envs): # Makespan
-                print(i,envs[i].opIDsOnMchs,envs[i].feat_copy[envs[i].opIDsOnMchs][:,0],envs[i].feat_copy[envs[i].opIDsOnMchs][:,2])
+                # print(i,envs[i].opIDsOnMchs,envs[i].feat_copy[envs[i].opIDsOnMchs][:,0],envs[i].feat_copy[envs[i].opIDsOnMchs][:,2])
                 logAlloc.append([i,envs[i].opIDsOnMchs.tolist(),envs[i].feat_copy[envs[i].opIDsOnMchs][:,0].tolist(),envs[i].feat_copy[envs[i].opIDsOnMchs][:,2].tolist()])
-        # sys.exit()
 
         for j in range(configs.num_envs): # Makespan
             ep_rewards[j] -= envs[j].posRewards # same actions/states as the initial maximum goal state
@@ -185,14 +178,17 @@ def main():
         # log.append([i_update, mean_rewards_all_env, mean_all_init_rewards])
         # print('Episode {}\t Last reward: {:.2f} \t Init reward: {:.2f}'.format(i_update + 1, mean_rewards_all_env, mean_all_init_rewards))
 
-    # with open('trainlogs/log_ppo_c15_train_' + str(configs.n_jobs) + '_' + str(configs.n_machines) + '_' + str(configs.task_time_low) + '_' + str(configs.task_time_high)+'.pkl', 'wb') as f:
-    #     pickle.dump(log, f)
-
-    with open('trainlogs/log_alloc_c15_v2_train_' + str(configs.n_jobs) + '_' + str(configs.n_machines) + '_' + str(configs.task_time_low) + '_' + str(configs.task_time_high)+'.pkl', 'wb') as f:
-        pickle.dump(logAlloc, f)
+    #Store the logs
+    if configs.record_ppo:
+        with open('trainlogs/log_ppo_'  + str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'.pkl', 'wb') as f:
+            pickle.dump(log, f)
+    
+    if configs.record_alloc:
+        with open('trainlogs/log_alloc_'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'.pkl', 'wb') as f:
+            pickle.dump(logAlloc, f)
 
 if __name__ == '__main__':
-    print("PPO Experiment")
+    print("PPO test")
     start_time = datetime.now().replace(microsecond=0)
     print("Started training: ", start_time)
     print("="*30)
