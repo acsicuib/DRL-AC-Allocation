@@ -3,3 +3,7 @@
 __pycache__
 *pyc
 *.pkl
+TMP
+TMP_*
+logs/*
+images/*

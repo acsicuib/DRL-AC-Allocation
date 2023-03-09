@@ -2,7 +2,7 @@ import gym
 import numpy as np
 from gym.utils import EzPickle
 from parameters import configs
-from utils import getCNTimes
+from environment.utils import getCNTimes
 import sys
 
 # def descomposeAction(action,number_tasks=configs.n_tasks,number_jobs=configs.n_jobs):
@@ -156,5 +156,5 @@ class SPP(gym.Env, EzPickle): #Service Placement Problem
         return self.allocations, (featuresTasks,featureDevices), reward, self.done(), self.omega, self.mask
 
 if __name__ == '__main__':
-    import env_lab
-    env_lab.main()
+    import environment.test_env as test_env
+    test_env.main()

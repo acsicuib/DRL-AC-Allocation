@@ -1,5 +1,5 @@
 import numpy as np
-from DAG_app_generator import generate_DAG_application
+from environment.DAG_app_generator import generate_DAG_application
 
 from parameters import configs 
 
@@ -28,6 +28,8 @@ def one_instance_gen(n_jobs,n_devices,cloud_features,dependency_degree):
     return times, adj, feat
 
 if __name__ == '__main__':
+    print("Test one_instance_gen function")
+
     n_jobs = 3
     n_devices = 5 # In total = 5+1, cloud entity
     cloud_features = [20,2,4,0]

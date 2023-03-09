@@ -1,6 +1,6 @@
 from parameters import configs
-from env import SPP
-from instance_generator import one_instance_gen
+from environment.env import SPP
+from environment.instance_generator import one_instance_gen
 import numpy as np
 import time
 

@@ -33,6 +33,7 @@ def generate_DAG_application(n_jobs,low,high,degree=0.3):
 
 
 if __name__ == '__main__':
+    print("Test generate_DAG_application function")
     n_jobs = 3
     times, adj = generate_DAG_application(n_jobs,3,20)
 

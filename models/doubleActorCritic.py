@@ -1,9 +1,9 @@
-from mlp import MLPActor
-from mlp import MLPCritic
+from models.mlp import MLPActor
+from models.mlp import MLPCritic
 import torch
 import torch.nn as nn
 from torch.distributions import Categorical
-from graphcnn import GraphCNN
+from models.graphcnn import GraphCNN
 from parameters import configs
 import torch.nn.functional as F
 import sys

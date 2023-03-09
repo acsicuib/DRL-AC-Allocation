@@ -5,7 +5,7 @@ feature_labels = ["Processing time","Cost","Latency","Load"]
 
 parser = argparse.ArgumentParser(description='Arguments')
 ### Case study name
-parser.add_argument('--name', type=str, default="x", help='Case study name to record results')
+parser.add_argument('--name', type=str, default="default", help='Case study name to record results')
 parser.add_argument('--record_ppo', type=bool, default=True, help='Record log of PPO evolution loss values per episode')
 parser.add_argument('--record_alloc', type=bool, default=True, help='Record log of placements per episode')
 parser.add_argument('--record_alloc_episodes', type=int, nargs='+', default=[0,10,20,40], help='Episodes where it gets a log of current placements')

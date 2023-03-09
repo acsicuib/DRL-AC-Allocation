@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from mlp import MLP
+from models.mlp import MLP
 # from parameters import configs
 import numpy as np
 # import sys

@@ -1,25 +1,26 @@
 import numpy as np
 
-""" Get the computational and network times of tasks
-The network latency plus service time of a Job is the sum of Tasks belong to Job
+"""
+Obtain the computation and network durations of tasks.
+The overall duration of a job, including network latency and service time, is the sum of the durations of its constituent tasks.
 
-Compute the service time (time required / machine's processing time (feat[,0])) 
-plus the latency of allocated machine 
+To calculate the service time, divide the required time in terms of operations by the device's processing time (feature 0: speed units). Then, add the allocated service's latency to this value.
+It considers the placement of dependented tasks to add if both devices are different or not, the latency.
 
 Example:
-    JobY = {T0, T1,T2}
-    timesJobY = 10,5,20
-    adjMatrix:
+    Job = {T0, T1,T2}
+    Job operations by task = 10, 5, 20
+    Dependencies: adjacency matrix =
          T0 > T1 > T2
          Tx > T1
 
-    allocations:
-          T0 in M0 (execution time: 20, latency: 10)
-          T1 in M1 (10,1)
-          T2 in M2 (1,5)
-          Tx in M0
+    Current allocations::
+          T0 in M0 where the M0 has a speed time of 20, and latency of 10) aka: (20,10)
+          T1 in M1 where it has (10,1)
+          T2 in M2 where it has (1,5)
+          Tx in M0 
                 
-    times:
+    Final time:
          T0 =  10/20 + 10  = 10.5      
          T1 =  5/10  + 1+1 = 2.5
          T2 =  20/1  + 5   = 25
@@ -44,14 +45,16 @@ def getCNTimes(allocations,times,feat,adj):
 
 
 if __name__ == '__main__':
-    from DAG_app_generator import generate_DAG_application
+    print("Testing getCNTimes function")
+    
+    from environment.DAG_app_generator import generate_DAG_application
 
     SEED = 2023
     np.random.seed(SEED)
 
 
     n_jobs = 3
-    n_machines = 5
+    n_devices = 5
     times, adj = generate_DAG_application(n_jobs,3,20)
 
     # times = np.array([[1, 1 ],[ 2 , 2 ]])
@@ -71,13 +74,13 @@ if __name__ == '__main__':
 
     feat_labels = ["Processing time","Cost","Lat","Load","Load Penalty"] 
     n_features = len(feat_labels)
-    feat_HW = np.random.choice(HW_options,n_machines)
-    feat_Cost = np.random.choice(Cost_options,n_machines)
-    feat_Lat = np.random.choice(latency_options,n_machines)
-    feat_Load = np.repeat([n_features],n_machines) #TODO
-    feat_LoadPena = np.zeros(n_machines)  
+    feat_HW = np.random.choice(HW_options,n_devices)
+    feat_Cost = np.random.choice(Cost_options,n_devices)
+    feat_Lat = np.random.choice(latency_options,n_devices)
+    feat_Load = np.repeat([n_features],n_devices) #TODO
+    feat_LoadPena = np.zeros(n_devices)  
 
-    feat = np.concatenate((feat_HW,feat_Cost,feat_Lat,feat_Load,feat_LoadPena)).reshape(n_features,n_machines).T
+    feat = np.concatenate((feat_HW,feat_Cost,feat_Lat,feat_Load,feat_LoadPena)).reshape(n_features,n_devices).T
     # assert np.array_equal(m_HW_features,m_fea[:,0])
     feat[0]= np.array([2,-3,1,-3,-3]) # Cloud entity
     feat[-1] = np.array([20,-3,10,-3,-3]) # Cloud entity
@@ -85,7 +88,7 @@ if __name__ == '__main__':
     print("HW features: ",feat_labels)
     print(feat)
 
-    allocations = np.zeros((n_machines,n_jobs**2),dtype=np.bool8)
+    allocations = np.zeros((n_devices,n_jobs**2),dtype=np.bool8)
     for jobi in range(times.size):
         allocations[-1,jobi]=True
 

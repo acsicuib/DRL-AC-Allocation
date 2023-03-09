@@ -5,8 +5,8 @@ from torch.distributions import Categorical
 from copy import deepcopy
 
 from parameters import configs
-from doubleActorCritic import ActorCritic
-from dag_aggregate import aggr_obs, dag_pool
+from models.doubleActorCritic import ActorCritic
+from models.dag_aggregate import aggr_obs, dag_pool
 
 
 
@@ -21,7 +21,6 @@ def eval_actions(p,ix_actions):
 
 class Memory: #TODO Clean non-used vars
     def __init__(self):
-        self.alloc_mb = []
         self.adj_mb = []
         self.featTask = []
         self.featMach = []
@@ -37,7 +36,6 @@ class Memory: #TODO Clean non-used vars
         self.logprobs_m = [] 
 
     def clear_memory(self):
-        del self.alloc_mb[:]
         del self.adj_mb[:]
         del self.featTask[:]
         del self.featMach[:]
@@ -184,5 +182,5 @@ class PPO:
 
 if __name__ == '__main__':
     # Debug
-    from ppo_train import main
+    from train_ppo import main
     main()

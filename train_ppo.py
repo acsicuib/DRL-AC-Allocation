@@ -8,19 +8,19 @@ import pickle
 from datetime import datetime
 
 from parameters import configs
-from env import *
-from ppo import PPO, Memory
-from instance_generator import one_instance_gen
-from dag_aggregate import dag_pool
+from environment.env import *
+from policy import PPO, Memory
+from environment.instance_generator import one_instance_gen
+from models.dag_aggregate import dag_pool
 
 device = torch.device(configs.device)
 
 def main():
 
-    print("Running case: ",configs.name)
-    print("\t tasks: ",configs.n_tasks)
-    print("\t devices: ",configs.n_devices)
-    print("\t episodes: ",configs.max_updates)
+    print("Policy Case: ",configs.name)
+    print("\t + tasks: ",configs.n_tasks)
+    print("\t + devices: ",configs.n_devices)
+    print("\t + episodes: ",configs.max_updates)
 
 
     #TODO clean old vars
@@ -50,7 +50,7 @@ def main():
         #TODO clean vars -> state 
         ep_rewards = np.zeros(configs.num_envs)
         init_rewards = np.zeros(configs.num_envs)
-        alloc_envs = []
+        # alloc_envs = []
         state_ft_envs,state_fm_envs= [],[]
         candidate_envs = []
         mask_envs = []
@@ -61,7 +61,7 @@ def main():
         for i, env in enumerate(envs):
             alloc, state, candidate, mask = env.reset(*one_instance_gen(n_jobs=configs.n_jobs, n_devices=configs.n_devices,cloud_features=configs.cloud_features, dependency_degree=configs.DAG_rand_dependencies_factor))
             adj_envs.append(env.adj)
-            alloc_envs.append(alloc)
+            # alloc_envs.append(alloc)
             state_ft_envs.append(state[0])
             state_fm_envs.append(state[1])
             candidate_envs.append(candidate)
@@ -74,7 +74,7 @@ def main():
             steps+=1
 
             adj_tensor_envs = [torch.from_numpy(np.copy(adj)).to(device).to_sparse() for adj in adj_envs]
-            alloc_tensor_envs = [torch.from_numpy(np.copy(alloc)).to(device) for alloc in alloc_envs]
+            # alloc_tensor_envs = [torch.from_numpy(np.copy(alloc)).to(device) for alloc in alloc_envs]
             state_ft_tensor_envs = [torch.from_numpy(np.copy(st)).to(device) for st in state_ft_envs]
             state_fm_tensor_envs = [torch.from_numpy(np.copy(st)).to(device) for st in state_fm_envs]
             candidate_tensor_envs = [torch.from_numpy(np.copy(candidate)).to(device) for candidate in candidate_envs]
@@ -107,7 +107,7 @@ def main():
                     memories[i].logprobs_m.append(logProb_m)
                     # m_idx_envs.append(log_machprob)
 
-            alloc_envs = []
+            # alloc_envs = []
             state_ft_envs = []
             state_fm_envs = []
             
@@ -119,7 +119,7 @@ def main():
             # Saving episode data
             for i in range(configs.num_envs):
                 memories[i].adj_mb.append(adj_tensor_envs[i]) #TODO Purge memories
-                memories[i].alloc_mb.append(alloc_tensor_envs[i])
+                # memories[i].alloc_mb.append(alloc_tensor_envs[i])
                 memories[i].state_ft.append(state_ft_tensor_envs[i])
                 memories[i].state_fm.append(state_fm_tensor_envs[i])
                 # memories[i].featTask.append(feat_task_tensor_envs[i])
@@ -134,7 +134,7 @@ def main():
                                                                            device=int(m_idx_envs[i]))
                 
 
-                alloc_envs.append(alloc)
+                # alloc_envs.append(alloc)
                 state_ft_envs.append(state[0])
                 state_fm_envs.append(state[1])
                 # featT_envs.append(featTasks)
@@ -180,20 +180,22 @@ def main():
 
     #Store the logs
     if configs.record_ppo:
-        with open('trainlogs/log_ppo_'  + str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'.pkl', 'wb') as f:
+        with open('logs/log_ppo_'  + str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'.pkl', 'wb') as f:
             pickle.dump(log, f)
     
     if configs.record_alloc:
-        with open('trainlogs/log_alloc_'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'.pkl', 'wb') as f:
+        with open('logs/log_ppo_alloc_'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'.pkl', 'wb') as f:
             pickle.dump(logAlloc, f)
+    
+    print("Done\n")
+
 
 if __name__ == '__main__':
-    print("PPO test")
+    print("Policy test: using default parameters")
     start_time = datetime.now().replace(microsecond=0)
-    print("Started training: ", start_time)
-    print("="*30)
+    print("Start training: ", start_time)
     main()
     end_time = datetime.now().replace(microsecond=0)
     print("Finish training: ", end_time)
     print("Total time: ",(end_time-start_time))
-    print("Done.")
+    print("Done policy test.")
