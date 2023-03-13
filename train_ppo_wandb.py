@@ -18,18 +18,25 @@ import wandb
 # Example sweep configuration
 count = 10
 sweep_configuration = {
-    'method': 'random',
+    'method': 'bayes',
     'name': 'sweep',
     'metric': {
-        'goal': 'maximize', 
+        'goal': 'minimize', 
         'name': 'reward'
         },
     'parameters': {
         # 'batch_size': {'values': [16, 32, 64]},
-        'epochs': {'values': [20, 40, 50]},
         'num_layers': {'values': [1, 2, 3, 4, 5]},
+        'num_mlp_layers_feature_extract': {'values': [1, 2, 3, 4, 5]},
+        'num_mlp_layers_actor': {'values': [1, 2, 3, 4, 5]},
+        'num_mlp_layers_critic': {'values': [1, 2, 3, 4, 5]},
+        'k_epochs': {'values': [1, 2, 3]},
+        'eps_clip': {'max': 0.5, 'min': 0.01},
         'lr_agent': {'max': 0.1, 'min': 0.0001},
-        'lr_critic': {'max': 0.1, 'min': 0.0001}
+        'lr_critic': {'max': 0.1, 'min': 0.0001},
+        'entloss_coef': {'max': 0.5, 'min': 0.001},
+        'vloss_coef': {'values': [1, 2, 3]},
+        'ploss_coef': {'values': [1, 2, 3]}
      }
 }
 
@@ -49,7 +56,17 @@ def main():
     configs.lr_agent = wandb.config.lr_agent
     configs.lr_critic = wandb.config.lr_critic
     configs.num_layers = wandb.config.num_layers
-    configs.max_updates = wandb.config.epochs
+    configs.num_mlp_layers_feature_extract = wandb.config.num_mlp_layers_feature_extract
+    configs.num_mlp_layers_actor = wandb.config.num_mlp_layers_actor
+    configs.num_mlp_layers_critic = wandb.config.num_mlp_layers_critic
+    configs.k_epochs = wandb.config.k_epochs
+    configs.eps_clip = wandb.config.eps_clip
+    configs.lr_agent = wandb.config.lr_agent
+    configs.lr_critic = wandb.config.lr_critic
+    configs.entloss_coef = wandb.config.entloss_coef
+    configs.vloss_coef = wandb.config.vloss_coef
+    configs.ploss_coef = wandb.config.ploss_coef
+    
     
 
 
@@ -203,7 +220,7 @@ def main():
         mean_all_init_rewards =  init_rewards.mean()
         log.append([i_update, mean_rewards_all_env,v_loss,mean_all_init_rewards])
         print('Episode {}\t Last reward: {:.2f}\t Mean_Vloss: {:.8f}\t Init reward: {:.2f}'.format(i_update + 1, mean_rewards_all_env, v_loss, mean_all_init_rewards))
-        wandb.log({"epoch":i_update + 1,"v_loss": v_loss, "loss": loss, "reward":mean_rewards_all_env, "init_reward":mean_all_init_rewards})
+        wandb.log({"epoch":i_update + 1,"v_loss": v_loss, "loss": loss, "reward":abs(mean_rewards_all_env), "init_reward":mean_all_init_rewards})
         ## DEBUG with out PPO Agent -. 
         # mean_rewards_all_env = ep_rewards.mean() # mean of the c-n time 
         # mean_all_init_rewards =  init_rewards.mean()
