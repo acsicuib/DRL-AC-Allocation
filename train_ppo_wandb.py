@@ -16,6 +16,7 @@ from models.dag_aggregate import dag_pool
 import wandb
 
 # Example sweep configuration
+count = 10
 sweep_configuration = {
     'method': 'random',
     'name': 'sweep',
@@ -226,7 +227,7 @@ if __name__ == '__main__':
     print("Policy test: using default parameters")
     start_time = datetime.now().replace(microsecond=0)
     print("Start training: ", start_time)
-    wandb.agent(sweep_id, function=main, count=10)
+    wandb.agent(sweep_id, function=main, count=count)
     end_time = datetime.now().replace(microsecond=0)
     print("Finish training: ", end_time)
     print("Total time: ",(end_time-start_time))

@@ -13,7 +13,6 @@ from policy import PPO, Memory
 from environment.instance_generator import one_instance_gen
 from models.dag_aggregate import dag_pool
 
-import wandb
 
 device = torch.device(configs.device)
 
@@ -23,18 +22,6 @@ def main():
     print("\t + tasks: ",configs.n_tasks)
     print("\t + devices: ",configs.n_devices)
     print("\t + episodes: ",configs.max_updates)
-
-    wandb.init(
-        # set the wandb project where this run will be logged
-        project="project-code-%s"%configs.name,
-        
-        # track hyperparameters and run metadata
-        config={
-            "learning_rate": configs.lr_agent,
-            "epochs": configs.max_updates,
-        }
-    )
-
 
 
     #TODO clean old vars
@@ -187,7 +174,7 @@ def main():
         mean_all_init_rewards =  init_rewards.mean()
         log.append([i_update, mean_rewards_all_env,v_loss,mean_all_init_rewards])
         print('Episode {}\t Last reward: {:.2f}\t Mean_Vloss: {:.8f}\t Init reward: {:.2f}'.format(i_update + 1, mean_rewards_all_env, v_loss, mean_all_init_rewards))
-        wandb.log({"epoch":i_update + 1,"v_loss": v_loss, "loss": loss, "reward":mean_rewards_all_env, "init_reward":mean_all_init_rewards})
+        
         ## DEBUG with out PPO Agent -. 
         # mean_rewards_all_env = ep_rewards.mean() # mean of the c-n time 
         # mean_all_init_rewards =  init_rewards.mean()
@@ -203,7 +190,7 @@ def main():
         with open('logs/log_ppo_alloc_'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'.pkl', 'wb') as f:
             pickle.dump(logAlloc, f)
     
-    wandb.finish()
+    
     print("Done\n")
 
 
