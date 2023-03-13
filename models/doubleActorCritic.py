@@ -13,6 +13,7 @@ class ActorCritic(nn.Module):
     def __init__(self,state_dim,device):
         # super().__init__()
         super(ActorCritic, self).__init__()
+        self.device = device
         self.feature_extract = GraphCNN(num_layers=configs.num_layers,
                                         num_mlp_layers=configs.num_mlp_layers_feature_extract,
                                         input_dim=configs.input_dim,
@@ -57,7 +58,7 @@ class ActorCritic(nn.Module):
 
         ## III. Placement part
         fthw_c =  fts_hw.reshape(candidate.size(0), configs.n_devices+1, 2) #TODO number of hw features
-        elem = torch.full(size=(candidate.size(0), configs.n_devices+1, configs.n_tasks*(configs.r_n_feat-1)),fill_value=0,dtype=torch.float32)
+        elem = torch.full(size=(candidate.size(0), configs.n_devices+1, configs.n_tasks*(configs.r_n_feat-1)),fill_value=0,dtype=torch.float32,device=self.device)
         # elem = torch.full(size=(1, fts_hw.shape[1],configs.n_tasks*(configs.r_n_feat-1)),fill_value=0,dtype=torch.float32)
         
         for e,task in enumerate(fts_x):
