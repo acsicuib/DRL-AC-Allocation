@@ -55,7 +55,6 @@ def main():
     configs.lr_agent = wandb.config.lr_agent
     configs.lr_critic = wandb.config.lr_critic
     configs.num_layers = wandb.config.num_layers
-    configs.num_mlp_layers_feature_extract = wandb.config.num_mlp_layers_feature_extract
     configs.num_mlp_layers_actor = wandb.config.num_mlp_layers_actor
     configs.num_mlp_layers_critic = wandb.config.num_mlp_layers_critic
     configs.k_epochs = wandb.config.k_epochs
