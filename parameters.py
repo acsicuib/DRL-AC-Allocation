@@ -39,27 +39,35 @@ parser.add_argument('--device', type=str, default="cpu", help='Device')
 
 
 ### GNN model
-parser.add_argument('--num_layers', type=int, default= 3, help='Number of MLPs for featuring extraction at GNN')
+# parser.add_argument('--num_layers', type=int, default= 3, help='Number of MLPs for featuring extraction at GNN')
+parser.add_argument('--num_layers', type=int, default= 4, help='Number of MLPs for featuring extraction at GNN')
 parser.add_argument('--neighbor_pooling_type', type=str, default="sum", help='Neighbour pooling type')
 parser.add_argument('--hidden_dim', type=int, default= 64, help='Hidden dims in the MLP (GNN model)')
 parser.add_argument('--num_mlp_layers_feature_extract', type=int, default= 3, help='Number of layers for each MLP (GNN model)')
 parser.add_argument('--graph_pool_type', type=str, default='average', help='Average weight of neighbourd extraction feature at GNN')
 
 ### Agent-Critic models. Both ACs work with the same parameters 
-parser.add_argument('--lr_agent', type=float, default= 2e-2, help='Actor learning factor')
-parser.add_argument('--lr_critic', type=float, default= 1e-2, help='Critic learning factor')
-parser.add_argument('--num_mlp_layers_actor', type=int, default= 3, help='MLP layers in the Actor network')
+# parser.add_argument('--lr_agent', type=float, default= 2e-2, help='Actor learning factor')
+parser.add_argument('--lr_agent', type=float, default=0.022, help='Actor learning factor')
+parser.add_argument('--lr_critic', type=float, default= 0.0269, help='Critic learning factor')
+# parser.add_argument('--lr_critic', type=float, default= 1e-2, help='Critic learning factor')
+# parser.add_argument('--num_mlp_layers_actor', type=int, default= 3, help='MLP layers in the Actor network')
+parser.add_argument('--num_mlp_layers_actor', type=int, default= 5, help='MLP layers in the Actor network')
 parser.add_argument('--num_mlp_layers_critic', type=int, default= 3, help='MLP layers in the Critic network')
 parser.add_argument('--hidden_dim_actor', type=int, default= 32, help='Hidden dimension of the Actor network')
 parser.add_argument('--hidden_dim_critic', type=int, default= 32, help='Hidden dimension of the Critic network')
 
 ### RL model
 parser.add_argument('--gamma', type=float, default= 1, help='RL discount factor')
-parser.add_argument('--k_epochs', type=int, default= 1, help='Number of episodes to update the policy')
-parser.add_argument('--eps_clip', type=float, default= 0.2, help='Actor-critics clip factor')
-parser.add_argument('--vloss_coef', type=float, default= 1, help='Critics loss coefficient')
+parser.add_argument('--k_epochs', type=int, default= 2, help='Number of episodes to update the policy')
+# parser.add_argument('--k_epochs', type=int, default= 1, help='Number of episodes to update the policy')
+parser.add_argument('--eps_clip', type=float, default= 0.25, help='Actor-critics clip factor')
+# parser.add_argument('--eps_clip', type=float, default= 0.2, help='Actor-critics clip factor')
+# parser.add_argument('--vloss_coef', type=float, default= 1, help='Critics loss coefficient')
+parser.add_argument('--vloss_coef', type=float, default= 3, help='Critics loss coefficient')
 parser.add_argument('--ploss_coef', type=float, default= 2, help='Actor-critics loss coefficient')
-parser.add_argument('--entloss_coef', type=float, default= 0.01, help='Entropy loss coefficient')
+# parser.add_argument('--entloss_coef', type=float, default= 0.01, help='Entropy loss coefficient')
+parser.add_argument('--entloss_coef', type=float, default= 0.023, help='Entropy loss coefficient')
 
 ### RL - Scheduler
 parser.add_argument('--decay_step_size', type=int, default= 2000, help='Decay step ratio')
