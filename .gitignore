@@ -8,3 +8,5 @@ TMP_*
 logs/*
 images/*
 wandb
+datasets/*
+

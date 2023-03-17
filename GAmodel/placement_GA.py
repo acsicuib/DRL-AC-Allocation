@@ -1,20 +1,19 @@
 import numpy as np
 from pymoo.core.problem import ElementwiseProblem
-from parameters import configs
 from pymoo.core.crossover import Crossover
 from pymoo.core.mutation import Mutation
 from pymoo.core.sampling import Sampling
 from environment.utils import getCNTimes,getCNCosts
 
 class PlacementProblem(ElementwiseProblem):
-    def __init__(self,n_var,n_objectives,time,adj,featHW):
+    def __init__(self,n_var,n_objectives,time,adj,featHW,n_devices,n_tasks):
         super().__init__(
             n_var = n_var,
             n_obj=n_objectives,
             n_ieq_constr=1
             )
-        self.number_devices = configs.n_devices+1 
-        self.n_tasks = configs.n_tasks 
+        self.number_devices = n_devices+1 
+        self.n_tasks = n_tasks 
 
         ## One Infraestructure, and one App
         self.executions = time

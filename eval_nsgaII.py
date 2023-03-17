@@ -4,7 +4,7 @@ from pymoo.termination import get_termination
 from pymoo.optimize import minimize
 
 from parameters import configs
-from placement_GA import MyMutation,MySampling,PlacementProblem,BinaryCrossover
+from GAmodel.placement_GA import MyMutation,MySampling,PlacementProblem,BinaryCrossover
 import pickle
 from datetime import datetime
 
@@ -38,7 +38,9 @@ def main():
                                    n_objectives=2, #2 funciones objetivos
                                    time=times,
                                    adj=adj,
-                                   featHW=feat) 
+                                   featHW=feat,
+                                   n_devices=configs.n_devices,
+                                   n_tasks=configs.n_tasks) 
 
         res = minimize(problem,
                     algorithm,

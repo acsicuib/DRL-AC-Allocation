@@ -4,8 +4,9 @@ from pymoo.termination import get_termination
 from pymoo.optimize import minimize
 
 from parameters import configs
-from placement_GA import MyMutation,MySampling,PlacementProblem,BinaryCrossover
+from GAmodel.placement_GA import MyMutation,MySampling,PlacementProblem,BinaryCrossover
 from pymoo.config import Config
+
 Config.warnings['not_compiled'] = False
 np.random.seed(configs.np_seed_train)
 
