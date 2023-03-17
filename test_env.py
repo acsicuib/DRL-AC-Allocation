@@ -1,6 +1,6 @@
 from parameters import configs
 from environment.env import SPP
-from environment.instance_generator import one_instance_gen
+from instance_generator import one_instance_gen
 import numpy as np
 import time
 
@@ -27,16 +27,26 @@ def main():
     print("LBs")
     print(env.LBs)
     
+    print("Costs")
+    print(env.Costs)
+
+
     print("Initial time:")
     print(np.sum(env.LBs))
-    print(env.max_endTime) 
+    print(env.max_endTime)
+
+    print("Initial COST:")
+    print(np.sum(env.Costs))
+    print(env.max_endCost)
 
     print("posRewards")
     print(env.posRewards) 
 
     print("Allocations")
     print(alloc)
-    rewards = [-env.max_endTime]
+
+    print("Start All the placements:")
+    rewards = [- env.initQuality]
     print("*"*30)
 
     while True:
@@ -46,14 +56,18 @@ def main():
         candidate_task = omega[~mask][ix_job]
         print("Candidate_job: ",candidate_task)
         device = env.selectRndDevice()
+        # device = env.selectBestCostDevice()
+        # device = env.selectBestLatencyDevice()
         print('Action:', device)
 
-        alloc, state, reward, done, omega, mask = env.step(candidate_task,device)
+        alloc, (state_t,state_m), reward, done, omega, mask = env.step(candidate_task,device)
         rewards.append(reward)
         print("Post alloc by task")
         print(env.opIDsOnMchs)
-        # print("post FEAT")
-        # print(featTasks)
+        # print("post State M")
+        # print(state_m)
+        print("post State T")
+        print(state_t)
         # print(featTasks.shape)
         
         # print("post OMEGA\n",omega)
@@ -61,8 +75,12 @@ def main():
         # print("post Alloc")
         # print(env.allocations)
         print('post LBs:\n', env.LBs)
+        print('post Costs:\n', env.Costs)
+
         print("post reward:\n", reward)
         print("post posReward:\n", env.posRewards)
+        # print("post featuresTasks:\n", state)
+
 
         # input("Press Enter to continue...") #debug
         
@@ -79,6 +97,9 @@ def main():
     print("LB")
     print(env.LBs)
     print(np.sum(env.LBs))
+    print("Cost")
+    print(env.Costs)
+    print(np.sum(env.Costs))
     # print("time")
     # print(t2 - t1)
     # # np.save('sol', env.opIDsOnMchs // n_m)

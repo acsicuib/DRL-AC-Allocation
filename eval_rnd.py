@@ -9,7 +9,7 @@ from datetime import datetime
 
 from parameters import configs
 from environment.env import *
-from environment.instance_generator import one_instance_gen
+from instance_generator import one_instance_gen
 
 
 def main():
@@ -54,6 +54,7 @@ def main():
                 ix_job = np.random.choice(len(candidate_envs[i][~mask_envs[i]]))
                 candidate_task = candidate_envs[i][~mask_envs[i]][ix_job]
                 device_id = envs[i].selectRndDevice()
+                # device_id = envs[i].selectBestCostDevice()
 
                 # V1. 1º Cualquiera sin los candidatos y posteriormente aplicando candidatos (modelo ppo_train.py)  # V1. 1º Cualquier sin los candidatos 
                 ### NO FUNCIONA - hay que aplicar el candidate
@@ -84,11 +85,16 @@ def main():
         if i_update in configs.record_alloc_episodes:
             # print("Final placement: ",i_update)
             # print(" -"*30)
-            for i in range(configs.num_envs): # Makespan
+            for i in range(configs.num_envs): 
                 # print(i,envs[i].opIDsOnMchs,envs[i].feat_copy[envs[i].opIDsOnMchs][:,0],envs[i].feat_copy[envs[i].opIDsOnMchs][:,2])
-                logAlloc.append([i,envs[i].opIDsOnMchs.tolist(),envs[i].feat_copy[envs[i].opIDsOnMchs][:,0].tolist(),envs[i].feat_copy[envs[i].opIDsOnMchs][:,2].tolist()])
+                logAlloc.append([i,
+                                 envs[i].opIDsOnMchs.tolist(), # allocations
+                                 envs[i].feat_copy[envs[i].opIDsOnMchs][:,0].tolist(), # Speed
+                                 envs[i].feat_copy[envs[i].opIDsOnMchs][:,2].tolist(), # Latency
+                                 envs[i].feat_copy[envs[i].opIDsOnMchs][:,1].tolist()  # Cost
+                                 ])
 
-        for j in range(configs.num_envs):  #Makespan
+        for j in range(configs.num_envs):  
             ep_rewards[j] -= envs[j].posRewards # same actions/states as the initial maximum goal state
                 
         # ep_rewards represents the computational and network time for the current allocation

@@ -43,18 +43,25 @@ def getCNTimes(allocations,times,feat,adj):
                 cntimes[task]+=feat_i[:,2][task]
     return cntimes.reshape(times.shape).astype(np.float32)
 
+def getCNCosts(allocations,feat):
+    idx_machines = np.argmax(allocations, axis=0)
+    feat_i = np.take(feat,idx_machines,axis=0)
+    cncost = np.zeros(allocations.shape[1])
+    # Plus latency times by dependencies
+    for task in range(allocations.shape[1]):
+        cncost[task] = feat_i[:,1][task]
+    return cncost.astype(np.float32)
 
 if __name__ == '__main__':
     print("Testing getCNTimes function")
     
-    from environment.DAG_app_generator import generate_DAG_application
+    from DAG_app_generator import generate_DAG_application
 
     SEED = 2023
     np.random.seed(SEED)
 
-
     n_jobs = 3
-    n_devices = 5
+    n_devices = 9
     times, adj = generate_DAG_application(n_jobs,3,20)
 
     # times = np.array([[1, 1 ],[ 2 , 2 ]])
@@ -69,8 +76,8 @@ if __name__ == '__main__':
     print(times)
 
     HW_options = [2,4,6]
-    Cost_options = [1,3]
-    latency_options = [5,10] #invertir category max-> min
+    Cost_options = [1,5,10,15,20]
+    latency_options = [1,5,10,15,20,25,30] #invertir category max-> min
 
     feat_labels = ["Processing time","Cost","Lat","Load","Load Penalty"] 
     n_features = len(feat_labels)
@@ -82,8 +89,8 @@ if __name__ == '__main__':
 
     feat = np.concatenate((feat_HW,feat_Cost,feat_Lat,feat_Load,feat_LoadPena)).reshape(n_features,n_devices).T
     # assert np.array_equal(m_HW_features,m_fea[:,0])
-    feat[0]= np.array([2,-3,1,-3,-3]) # Cloud entity
-    feat[-1] = np.array([20,-3,10,-3,-3]) # Cloud entity
+    # feat[0]= np.array([2,-3,1,-3,-3]) # Cloud entity
+    feat[-1] = np.array([20,10,10,-3,-3]) # Cloud entity
 
     print("HW features: ",feat_labels)
     print(feat)
@@ -101,9 +108,13 @@ if __name__ == '__main__':
     allocations[0,3]=True
     allocations[1,4]=True
     allocations[0,5]=True
+    print("Allocations:")
     print(allocations)
 
     t = getCNTimes(allocations,times,feat,adj)
-    print(t)
-    print(np.sum(t,axis=1)) #time by job
-    print(np.sum(t)) #time by app
+    print("Times: \n",t)
+    print("Time per job: \n",np.sum(t,axis=1)) #time by job
+    print("Time per app: \n",np.sum(t)) #time by app
+
+    c = getCNCosts(allocations,feat)
+    print("Cost: \n",c)

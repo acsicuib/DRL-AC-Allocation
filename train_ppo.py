@@ -10,7 +10,7 @@ from datetime import datetime
 from parameters import configs
 from environment.env import *
 from policy import PPO, Memory
-from environment.instance_generator import one_instance_gen
+from instance_generator import one_instance_gen
 from models.dag_aggregate import dag_pool
 
 
@@ -46,11 +46,15 @@ def main():
     # training loop
     log = []
     logAlloc = []
+    validation_log = []
+    validation_v_loss = 100000
     for i_update in range(configs.max_updates):
         
         #TODO clean vars -> state 
         ep_rewards = np.zeros(configs.num_envs)
         init_rewards = np.zeros(configs.num_envs)
+        init_times = np.zeros(configs.num_envs)
+        init_costs = np.zeros(configs.num_envs)
         # alloc_envs = []
         state_ft_envs,state_fm_envs= [],[]
         candidate_envs = []
@@ -69,7 +73,8 @@ def main():
             mask_envs.append(mask)
             ep_rewards[i] = - env.initQuality
             init_rewards[i] = - env.initQuality
-
+            init_times[i] = env.max_endTime
+            init_costs[i] = env.max_endCost
         steps = 0    
         while True:
             steps+=1
@@ -158,11 +163,20 @@ def main():
             # print(" -"*30)
             for i in range(configs.num_envs): # Makespan
                 # print(i,envs[i].opIDsOnMchs,envs[i].feat_copy[envs[i].opIDsOnMchs][:,0],envs[i].feat_copy[envs[i].opIDsOnMchs][:,2])
-                logAlloc.append([i,envs[i].opIDsOnMchs.tolist(),envs[i].feat_copy[envs[i].opIDsOnMchs][:,0].tolist(),envs[i].feat_copy[envs[i].opIDsOnMchs][:,2].tolist()])
+                                logAlloc.append([i,
+                                 envs[i].opIDsOnMchs.tolist(), # allocations
+                                 envs[i].feat_copy[envs[i].opIDsOnMchs][:,0].tolist(), # Speed
+                                 envs[i].feat_copy[envs[i].opIDsOnMchs][:,2].tolist(), # Latency
+                                 envs[i].feat_copy[envs[i].opIDsOnMchs][:,1].tolist()  # Cost
+                                 ])
 
+        time_all_env, cost_all_env = [], []
         for j in range(configs.num_envs): # Makespan
             ep_rewards[j] -= envs[j].posRewards # same actions/states as the initial maximum goal state
-                
+            time_all_env.append(envs[j].max_endTime)
+            cost_all_env.append(envs[j].max_endCost)
+        time_all_env = np.array(time_all_env) 
+        cost_all_env = np.array(cost_all_env) 
         # update PPO agent         
         loss, v_loss  = ppo_agent.update(memories)        
 
@@ -172,14 +186,26 @@ def main():
        
         mean_rewards_all_env = sum(ep_rewards) / len(ep_rewards)
         mean_all_init_rewards =  init_rewards.mean()
-        log.append([i_update, mean_rewards_all_env,v_loss,mean_all_init_rewards])
-        print('Episode {}\t Last reward: {:.2f}\t Mean_Vloss: {:.8f}\t Init reward: {:.2f}'.format(i_update + 1, mean_rewards_all_env, v_loss, mean_all_init_rewards))
+
+        #TODO Take care log-size in case of large number of epochs 
+        log.append([i_update, mean_rewards_all_env,v_loss,mean_all_init_rewards,init_times.mean(),time_all_env.mean(),init_costs.mean(),cost_all_env.mean()])
+        print('Episode {} Last reward: {:.2f}\t Mean_Vloss: {:.8f}\t Init reward: {:.2f}\t Init Time: {:.2f}\t Time: {:.2f}\n Init Cost: {:.2f}\t Cost: {:.2f}'.
+              format(i_update + 1, mean_rewards_all_env, v_loss, mean_all_init_rewards,init_times.mean(),time_all_env.mean(),init_costs.mean(),cost_all_env.mean()))
         
-        ## DEBUG with out PPO Agent -. 
-        # mean_rewards_all_env = ep_rewards.mean() # mean of the c-n time 
-        # mean_all_init_rewards =  init_rewards.mean()
-        # log.append([i_update, mean_rewards_all_env, mean_all_init_rewards])
-        # print('Episode {}\t Last reward: {:.2f} \t Init reward: {:.2f}'.format(i_update + 1, mean_rewards_all_env, mean_all_init_rewards))
+       
+        #TODO improve validation process
+        # if (i_update + 1) % 100 == 0:#TODO 
+        if (i_update + 1) > 10:#TODO 
+            if validation_v_loss > v_loss:
+                torch.save(ppo_agent.policy.state_dict(), 'savedModels/{}.pth'.format(
+                    str(configs.name) + "_" +str(configs.n_jobs) + '_' + str(configs.n_devices)))
+                validation_v_loss = v_loss
+            print('The validation quality is:', validation_v_loss)
+            file_writing_obj1 = open(
+                'logs/vali_' + str(configs.name) +"_" + str(configs.n_jobs) + '_' + str(configs.n_devices) + '.txt', 'w')
+            file_writing_obj1.write(str(validation_log))
+        t5 = time.time()
+
 
     #Store the logs
     if configs.record_ppo:
@@ -195,7 +221,7 @@ def main():
 
 
 if __name__ == '__main__':
-    print("Policy test: using default parameters")
+    print("TRAINING our policy: using default parameters")
     start_time = datetime.now().replace(microsecond=0)
     print("Start training: ", start_time)
     main()

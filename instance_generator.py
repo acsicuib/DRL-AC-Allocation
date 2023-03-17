@@ -1,6 +1,5 @@
 import numpy as np
 from environment.DAG_app_generator import generate_DAG_application
-
 from parameters import configs 
 
 def one_instance_gen(n_jobs,n_devices,cloud_features,dependency_degree):
@@ -32,9 +31,12 @@ if __name__ == '__main__':
 
     n_jobs = 3
     n_devices = 5 # In total = 5+1, cloud entity
-    cloud_features = [20,2,4,0]
+    cloud_features = [20,10,4,0]
     degree = 0.2
     for i in range(10):
         times, adj,feat = one_instance_gen(n_jobs,n_devices,cloud_features,degree)
-        print(times,adj,feat)
+        print("Times: \n",times)
+        print("AdjM: \n",adj)
+        print("Feat: %s\n"%configs.feature_labels,feat)
+        # print(times),adj,feat)
         print("-"*40)

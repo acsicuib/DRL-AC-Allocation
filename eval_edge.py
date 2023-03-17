@@ -9,7 +9,7 @@ from datetime import datetime
 
 from parameters import configs
 from environment.env import *
-from environment.instance_generator import one_instance_gen
+from instance_generator import one_instance_gen
 
 ###
 # Reward TEST in the environment when it chooses the best machine in terms of latency 

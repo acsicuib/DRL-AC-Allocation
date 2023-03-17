@@ -10,7 +10,7 @@ from datetime import datetime
 from parameters import configs
 from environment.env import *
 from policy import PPO, Memory
-from environment.instance_generator import one_instance_gen
+from instance_generator import one_instance_gen
 from models.dag_aggregate import dag_pool
 
 import wandb
@@ -239,7 +239,7 @@ def main():
 
 
 if __name__ == '__main__':
-    print("Policy test: using default parameters")
+    print("TRAINING our policy in wandb plataform")
     start_time = datetime.now().replace(microsecond=0)
     print("Start training: ", start_time)
     wandb.agent(sweep_id, function=main, count=count)

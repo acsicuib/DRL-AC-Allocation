@@ -57,19 +57,20 @@ class ActorCritic(nn.Module):
         v = self.critic(h_pooled) #TODO CRITIC?
 
         ## III. Placement part
-        fthw_c =  fts_hw.reshape(candidate.size(0), configs.n_devices+1, 2) #TODO number of hw features
+        fthw_c =  fts_hw.reshape(candidate.size(0), configs.n_devices+1, configs.r_n_feat-1) #TODO number of hw features
         elem = torch.full(size=(candidate.size(0), configs.n_devices+1, configs.n_tasks*(configs.r_n_feat-1)),fill_value=0,dtype=torch.float32,device=self.device)
         # elem = torch.full(size=(1, fts_hw.shape[1],configs.n_tasks*(configs.r_n_feat-1)),fill_value=0,dtype=torch.float32)
         
         for e,task in enumerate(fts_x):
             lm = (e//(configs.n_tasks))
             ix_device = int(task[-1])
-            task_pos = (e*2)%((configs.n_tasks)*2)
-            elem[lm][ix_device][task_pos:task_pos+1]=task[:1] #TODO HW features 
+            task_pos = (e*(configs.r_n_feat-1))%((configs.n_tasks)*(configs.r_n_feat-1))
+            elem[lm][ix_device][task_pos:task_pos+1]=task[0] #TODO HW features (normaliozed time, )
+            elem[lm][ix_device][task_pos+1:task_pos+2]=task[1] #TODO HW features (normalized cost)
+            elem[lm][ix_device][task_pos+2:task_pos+3]=task[2] #TODO HW features (tag finished)
 
 
         concateHWFea = torch.cat((fthw_c, elem), dim=-1)
-       
         device_scores = self.actorPL(concateHWFea)
         mhi = F.softmax(device_scores, dim=1)
         distMH = Categorical(mhi.squeeze())

@@ -2,7 +2,7 @@ import gym
 import numpy as np
 from gym.utils import EzPickle
 from parameters import configs
-from environment.utils import getCNTimes
+from environment.utils import getCNTimes, getCNCosts
 import sys
 
 # def descomposeAction(action,number_tasks=configs.n_tasks,number_jobs=configs.n_jobs):
@@ -73,11 +73,13 @@ class SPP(gym.Env, EzPickle): #Service Placement Problem
             self.allocations[-1,jobi]=1
 
         self.LBs = getCNTimes(self.allocations,self.times,self.feat_copy,self.adj)
+        self.Costs = getCNCosts(self.allocations,self.feat_copy)
 
         # Init. features
         # Worst Response Time
         self.max_endTime = np.sum(self.LBs) #dynamic - step() / can change
-        self.initQuality = self.max_endTime #static limit
+        self.max_endCost = np.sum(self.Costs)
+        self.initQuality = self.getRewardInit() #self.max_endTime #static limit
 
         # self.max_endTime = times.sum()/self.fea_c.min(axis=0)[0] + self.fea_c.max(axis=0)[2]
         # print("MAX_endTime", self.max_endTime)
@@ -85,12 +87,13 @@ class SPP(gym.Env, EzPickle): #Service Placement Problem
         # Return phase
         # Tasks states
         featuresTasks = np.concatenate((self.LBs.reshape(-1, 1)/configs.et_normalize_coef,
-                                  self.finished_mark.reshape(-1, 1),
-                                  self.opIDsOnMchs.reshape(-1, 1)), axis=1).astype(np.float32)
+                                        self.Costs.reshape(-1, 1)/configs.et_normalize_coef_cost,
+                                        self.finished_mark.reshape(-1, 1),
+                                        self.opIDsOnMchs.reshape(-1, 1)), axis=1).astype(np.float32)
         
         # Device states:: Normalize each column by range
-        featureDevices = self.feat_copy[:,[0,2]] #Execution time,Latency : shape(Device,features)
-        for col in range(2): #TODO fix definitive number of features
+        featureDevices = self.feat_copy[:,[0,1,2]] #Execution time,Latency : shape(Device,features)
+        for col in range(featureDevices.shape[1]): 
             featureDevices[:,col] /= np.abs(featureDevices[:,col]).max()
 
 
@@ -106,7 +109,20 @@ class SPP(gym.Env, EzPickle): #Service Placement Problem
         device_lowest_latency = self.feat_copy[:,2].argmin() # gets the lowest latency device
         return device_lowest_latency
 
+    def selectBestCostDevice(self):
+        #TODO improve selection of columns: value=2
+        device_lowest_cost = self.feat_copy[:,1].argmin() # gets the lowest latency device
+        return device_lowest_cost
 
+    def getRewardInit(self):
+        return configs.rewardWeightTime*(self.max_endTime) + configs.rewardWeightCost*(self.max_endCost)
+    
+    # def getCurrentTime(self):
+    #     return np.sum(self.LBs) #== max_endTime
+    
+    # def getCurrentCost(self): 
+    #     return np.sum(self.Costs) #== man_endCost
+    
     def step(self,task, device):
         if task not in self.partial_sol_sequeence: # resolved task
             row = task // self.number_jobs #or job
@@ -123,9 +139,10 @@ class SPP(gym.Env, EzPickle): #Service Placement Problem
             # allocation device by task (index)
             self.opIDsOnMchs = np.argmax(self.allocations,axis=0)
             
-            # Metrics update
+            # Update metrics
             self.LBs = getCNTimes(self.allocations,self.times,self.feat_copy,self.adj)
-                        
+            self.Costs = getCNCosts(self.allocations,self.feat_copy) 
+
             # Omega/Candidate task & Mask/Finished job
             if task in self.last_col:
                 self.omega[task // self.number_jobs] += 1
@@ -135,26 +152,27 @@ class SPP(gym.Env, EzPickle): #Service Placement Problem
         # Return phase
         # Tasks states
         featuresTasks = np.concatenate((self.LBs.reshape(-1, 1)/configs.et_normalize_coef,
-                                  self.finished_mark.reshape(-1, 1),
-                                  self.opIDsOnMchs.reshape(-1, 1)), axis=1).astype(np.float32)
+                                        self.Costs.reshape(-1, 1)/configs.et_normalize_coef_cost,
+                                        self.finished_mark.reshape(-1, 1),
+                                        self.opIDsOnMchs.reshape(-1, 1)), axis=1).astype(np.float32)
         
         # Device states
         #TODO fix definitive number of features
-        featureDevices = self.feat_copy[:,[0,2]] #Execution time,Latency : shape(device,features)
+        featureDevices = self.feat_copy[:,[0,1,2]] #Execution time, COST , Latency : shape(device,features)
 
         for col in range(featureDevices.shape[1]):
             featureDevices[:,col] /= np.abs(featureDevices[:,col]).max()
 
         # Reward
-        reward = - (np.sum(self.LBs) - self.max_endTime)
+        reward = - (configs.rewardWeightTime*(np.sum(self.LBs) - self.max_endTime) + configs.rewardWeightCost*(np.sum(self.Costs)-self.max_endCost))
         if reward == 0: 
             reward = configs.rewardscale #same action/state as the initial maximum
             self.posRewards += reward
 
         self.max_endTime = np.sum(self.LBs)
+        self.max_endCost = np.sum(self.Costs)
         
         return self.allocations, (featuresTasks,featureDevices), reward, self.done(), self.omega, self.mask
 
 if __name__ == '__main__':
-    import environment.test_env as test_env
-    test_env.main()
+    print("Run file: /test_env.py")
