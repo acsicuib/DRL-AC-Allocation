@@ -233,7 +233,7 @@ if __name__ == '__main__':
 
     file_writing_obj1 = open(
         'logs/exec_train_ppo_time_' + str(configs.name) +"_" + str(configs.n_jobs) + '_' + str(configs.n_devices) + '.txt', 'w')
-    file_writing_obj1.write("%i\n"%((end_time-start_time)))
+    file_writing_obj1.write(str((end_time-start_time)))
     file_writing_obj1.close()
 
     print("Done policy test.")
