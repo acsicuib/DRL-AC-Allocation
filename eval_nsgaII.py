@@ -8,6 +8,9 @@ from GAmodel.placement_GA import MyMutation,MySampling,PlacementProblem,BinaryCr
 import pickle
 from datetime import datetime
 
+from pymoo.config import Config
+Config.warnings['not_compiled'] = False
+
 def main():
     np.random.seed(configs.np_seed_train)
     
@@ -29,13 +32,14 @@ def main():
         eliminate_duplicates=True
     )
 
-    termination = get_termination("n_gen", 50)
+    termination = get_termination("n_gen", configs.n_gen)
 
     log_pf = []
     for i, sample  in enumerate(data):
+        print("Running episode: %i"%(i+1))
         times, adj, feat = sample
         problem = PlacementProblem(n_var=(configs.n_devices+1)*configs.n_tasks,
-                                   n_objectives=2, #2 funciones objetivos
+                                   n_objectives=2, #TODO fix 2 funciones objetivos
                                    time=times,
                                    adj=adj,
                                    featHW=feat,

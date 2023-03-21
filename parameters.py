@@ -17,6 +17,9 @@ parser.add_argument('--et_normalize_coef_cost', type=int, default=100, help='Coe
 parser.add_argument('--rewardWeightTime', type=float, default=0.7, help='Reward ratio for the Time-goal weight')
 parser.add_argument('--rewardWeightCost', type=float, default=0.3, help='Reward ratio for the Cost-goal weight')
 
+### Dataset for testing all models
+parser.add_argument('--np_seed_dataset',  type=int, default= 1, help="Numpy seed for dataset generation")
+parser.add_argument('--len_dataset',  type=int, default= 10, help="Size of dataset")
 
 ### Experimental parameters
 parser.add_argument('--num_envs', type=int, default=40, help='Number of environments/trajectories in each episode')
@@ -83,6 +86,9 @@ parser.add_argument('--decay_step_size', type=int, default= 2000, help='Decay st
 parser.add_argument('--decay_ratio', type=float, default= 0.9, help='Decay ratio')
 parser.add_argument('--decayflag', type=bool, default=False, help='Apply decay step')
 
+### GA - comparative
+# parser.add_argument('--ref_point', nargs='+', type=float, default=[200., 180.], help="Reference point for Hypervolumen computation")
+parser.add_argument('--n_gen',  type=int, default= 100, help="Number of generations")
 
 # Transforms arguments to a global variable
 configs = parser.parse_args()

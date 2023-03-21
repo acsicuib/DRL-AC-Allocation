@@ -195,16 +195,17 @@ def main():
        
         #TODO improve validation process
         # if (i_update + 1) % 100 == 0:#TODO 
-        if (i_update + 1) > 10:#TODO 
+        if i_update  > 9 and (i_update%10) == 0: #TODO 
             if validation_v_loss > v_loss:
                 torch.save(ppo_agent.policy.state_dict(), 'savedModels/{}.pth'.format(
                     str(configs.name) + "_" +str(configs.n_jobs) + '_' + str(configs.n_devices)))
                 validation_v_loss = v_loss
-            print('The validation quality is:', validation_v_loss)
+            # print('The validation quality is:', validation_v_loss)
             file_writing_obj1 = open(
                 'logs/vali_' + str(configs.name) +"_" + str(configs.n_jobs) + '_' + str(configs.n_devices) + '.txt', 'w')
-            file_writing_obj1.write(str(validation_log))
-        t5 = time.time()
+            file_writing_obj1.write("%i,%f\n"%(i_update,validation_log))
+            file_writing_obj1.close()
+        # t5 = time.time()
 
 
     #Store the logs
@@ -228,4 +229,11 @@ if __name__ == '__main__':
     end_time = datetime.now().replace(microsecond=0)
     print("Finish training: ", end_time)
     print("Total time: ",(end_time-start_time))
+    
+
+    file_writing_obj1 = open(
+        'logs/exec_train_ppo_time_' + str(configs.name) +"_" + str(configs.n_jobs) + '_' + str(configs.n_devices) + '.txt', 'w')
+    file_writing_obj1.write("%i\n"%((end_time-start_time)))
+    file_writing_obj1.close()
+
     print("Done policy test.")

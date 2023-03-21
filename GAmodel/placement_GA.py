@@ -92,7 +92,7 @@ class BinaryCrossover(Crossover):
             _X[0, k] = off1.reshape(1,-1).squeeze()
             _X[1, k] = off2.reshape(1,-1).squeeze()
 
-        MyMutation(prob=self.prob)._do(problem,_X) #TODO REMOVE mutate new generation
+        _X = MyMutation(prob=self.prob)._do(problem,_X) #TODO REMOVE mutate new generation
         return _X
 
 if __name__ == "__main__":
