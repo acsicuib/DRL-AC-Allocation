@@ -2,20 +2,32 @@
 Perf time  46.224182042
 time = 1200, cost 550
 
-E99_9
 
+################################################
+E99_9 ########################
+########################################################################
+
+
+########################
 ### Dataset
+########################
 python -u "/Users/isaac/Projects/DRL-AC-Allocation/generate_dataset.py" --name E99_9 --n_devices 99 --n_jobs 9 --len_dataset 10 --np_seed_dataset 21032023
 
+########################
 ### GA
+########################
 python -u "/Users/isaac/Projects/DRL-AC-Allocation/eval_nsgaII.py" --name E99_9 --n_devices 99 --n_jobs 9 --len_dataset 10 --np_seed_dataset 21032023
 
+########################
 ### TRAIN DR
+########################
 ssh isaac@172.30.248.28
+
 pyenv activate DGLenv
+cd projects/DRL-AC-Allocation
 
-nohup     > foo.out 2> foo.err < /dev/null &
+nohup  python -u "train_ppo.py" --name E99_9 --n_devices 99 --n_jobs 9 --max_updates 100 --device cuda   > foo.out 2> foo.err < /dev/null &
 
-python -u "/Users/isaac/Projects/DRL-AC-Allocation/train_ppo.py" --name E99_9 --n_devices 99 --n_jobs 9 --max_updates 300 --device cuda
+		python -u "train_ppo.py" --name E99_9 --n_devices 99 --n_jobs 9 --max_updates 100 --device cuda
 
-
+cat foo.out

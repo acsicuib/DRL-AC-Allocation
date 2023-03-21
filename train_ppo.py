@@ -200,11 +200,11 @@ def main():
                 torch.save(ppo_agent.policy.state_dict(), 'savedModels/{}.pth'.format(
                     str(configs.name) + "_" +str(configs.n_jobs) + '_' + str(configs.n_devices)))
                 validation_v_loss = v_loss
-            # print('The validation quality is:', validation_v_loss)
-            file_writing_obj1 = open(
-                'logs/vali_' + str(configs.name) +"_" + str(configs.n_jobs) + '_' + str(configs.n_devices) + '.txt', 'w')
-            file_writing_obj1.write("%i,%f\n"%(i_update,validation_log))
-            file_writing_obj1.close()
+                # print('The validation quality is:', validation_v_loss)
+                file_writing_obj1 = open(
+                    'logs/vali_' + str(configs.name) +"_" + str(configs.n_jobs) + '_' + str(configs.n_devices) + '.txt', 'w')
+                file_writing_obj1.write("%i,%f\n"%(i_update,validation_v_loss))
+                file_writing_obj1.close()
         # t5 = time.time()
 
 

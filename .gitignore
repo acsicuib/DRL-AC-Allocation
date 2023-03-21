@@ -1,5 +1,6 @@
 .vscode/
 .ipynb_checkpoints
+.CONF_REPO
 __pycache__
 *pyc
 *.pkl
@@ -9,4 +10,5 @@ logs/*
 images/*
 wandb
 datasets/*
-
+CONFIGURACIONES.txt
+CONFIGURACIONES.txt
