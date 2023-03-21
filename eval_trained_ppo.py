@@ -24,10 +24,10 @@ def main():
     print("\t + episodes: ",configs.max_updates)
 
     #TODO clean old vars
-    torch.manual_seed(configs.torch_seed)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed_all(configs.torch_seed)
-    np.random.seed(configs.np_seed_train)
+    # torch.manual_seed(configs.torch_seed)
+    # if torch.cuda.is_available():
+    #     torch.cuda.manual_seed_all(configs.torch_seed)
+    # np.random.seed(configs.np_seed_train)
     
     number_all_device_features = len(configs.feature_labels) #TODO fix 
     

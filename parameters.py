@@ -14,8 +14,8 @@ parser.add_argument('--et_normalize_coef', type=int, default=1000, help='Coefici
 parser.add_argument('--et_normalize_coef_cost', type=int, default=100, help='Coeficient factor to normalize application cost for deploymen')
 
 # MUST rewardWeightTime + rewardWeightCost = 1
-parser.add_argument('--rewardWeightTime', type=float, default=0.7, help='Reward ratio for the Time-goal weight')
-parser.add_argument('--rewardWeightCost', type=float, default=0.3, help='Reward ratio for the Cost-goal weight')
+parser.add_argument('--rewardWeightTime', type=float, default=0.55, help='Reward ratio for the Time-goal weight')
+parser.add_argument('--rewardWeightCost', type=float, default=0.45, help='Reward ratio for the Cost-goal weight')
 
 ### Dataset for testing all models
 parser.add_argument('--np_seed_dataset',  type=int, default= 1, help="Numpy seed for dataset generation")

@@ -12,7 +12,7 @@ from environment.env import *
 from policy import PPO, Memory
 from instance_generator import one_instance_gen
 from models.dag_aggregate import dag_pool
-
+from validation import validate_model
 
 device = torch.device(configs.device)
 
@@ -43,11 +43,24 @@ def main():
                              batch_size=torch.Size([1, configs.n_tasks, configs.n_tasks]),
                              n_nodes=configs.n_tasks, device=device)
     
+    ### Validate date
+    path_dt = 'datasets/dt_VALIDATION_%s_%i_%i.npz'%(configs.name,configs.n_jobs,configs.n_devices)
+    dataset = np.load(path_dt)
+    dataset = [dataset[key] for key in dataset]
+    dataVali = []
+    for sample in range(len(dataset[0])):
+        dataVali.append((dataset[0][sample],
+                     dataset[1][sample],
+                     dataset[2][sample],
+                     ))
+    print("Loaded data, len: %i"%len(dataVali)) 
+
     # training loop
     log = []
     logAlloc = []
     validation_log = []
-    validation_v_loss = 100000
+    record_reward_valid = 10000000
+    
     for i_update in range(configs.max_updates):
         
         #TODO clean vars -> state 
@@ -192,19 +205,21 @@ def main():
         print('Episode {} Last reward: {:.2f}\t Mean_Vloss: {:.8f}\t Init reward: {:.2f}\t Init Time: {:.2f}\t Time: {:.2f}\n Init Cost: {:.2f}\t Cost: {:.2f}'.
               format(i_update + 1, mean_rewards_all_env, v_loss, mean_all_init_rewards,init_times.mean(),time_all_env.mean(),init_costs.mean(),cost_all_env.mean()))
         
-       
-        #TODO improve validation process
-        # if (i_update + 1) % 100 == 0:#TODO 
-        if i_update  > 9 and (i_update%10) == 0: #TODO 
-            if validation_v_loss > v_loss:
+
+        if (i_update + 1) % 10 == 0:
+            avg_reward_valid = - validate_model(dataVali, ppo_agent.policy).mean() # return rewards from validate dataset
+            validation_log.append(avg_reward_valid)
+            if avg_reward_valid < record_reward_valid:
+                print("\t Storage a model %i"%(i_update+1))
                 torch.save(ppo_agent.policy.state_dict(), 'savedModels/{}.pth'.format(
-                    str(configs.name) + "_" +str(configs.n_jobs) + '_' + str(configs.n_devices)))
-                validation_v_loss = v_loss
-                # print('The validation quality is:', validation_v_loss)
+                        str(configs.name) + "_" +str(configs.n_jobs) + '_' + str(configs.n_devices)))
+                record_reward_valid = avg_reward_valid
+                
                 file_writing_obj1 = open(
-                    'logs/vali_' + str(configs.name) +"_" + str(configs.n_jobs) + '_' + str(configs.n_devices) + '.txt', 'w')
-                file_writing_obj1.write("%i,%f\n"%(i_update,validation_v_loss))
+                        'logs/vali_' + str(configs.name) +"_" + str(configs.n_jobs) + '_' + str(configs.n_devices) + '.txt', 'w')
+                file_writing_obj1.write(str(validation_log))
                 file_writing_obj1.close()
+
         # t5 = time.time()
 
 

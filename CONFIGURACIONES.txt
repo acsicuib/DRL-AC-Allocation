@@ -26,6 +26,8 @@ ssh isaac@172.30.248.28
 pyenv activate DGLenv
 cd projects/DRL-AC-Allocation
 
+python -u "generate_dataset.py" --name E99_9 --n_devices 99 --n_jobs 9 --max_updates 100 --len_dataset 50
+
 nohup  python -u "train_ppo.py" --name E99_9 --n_devices 99 --n_jobs 9 --max_updates 100 --device cuda   > foo.out 2> foo.err < /dev/null &
 
 		python -u "train_ppo.py" --name E99_9 --n_devices 99 --n_jobs 9 --max_updates 100 --device cuda
