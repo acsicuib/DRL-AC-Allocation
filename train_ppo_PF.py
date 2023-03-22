@@ -51,6 +51,10 @@ def main():
             # print(".")
             configs.rewardWeightTime = wt/10.
             configs.rewardWeightCost = wc/10.
+            print(configs.rewardWeightCost)
+            print(configs.rewardWeightTime)
+
+            
             codeW = str(int(configs.rewardWeightTime*10))+str(int(configs.rewardWeightCost*10))
             
             
@@ -65,7 +69,7 @@ def main():
 
             number_all_device_features = len(configs.feature_labels) #TODO fix 
             envs = [SPP(number_jobs=configs.n_jobs, number_devices=configs.n_devices,number_features=number_all_device_features) for _ in range(configs.num_envs)]
-        
+            
             memories = [Memory() for _ in range(configs.num_envs)]
 
             # initialize a PPO agent
@@ -82,11 +86,11 @@ def main():
             
             if torch.cuda.is_available(): 
                 ppo_agent.policy.load_state_dict(torch.load(path)) #EXPERIMENTS FROM GPYU-server
-                ppo_agent.policy_old.load_state_dict(torch.load(path)) #EXPERIMENTS FROM GPYU-server
+                # ppo_agent.policy_old.load_state_dict(torch.load(path)) #EXPERIMENTS FROM GPYU-server
             else:
                 ppo_agent.policy.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
-                ppo_agent.policy_old.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
-
+                # ppo_agent.policy_old.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
+            ppo_agent.fromModel()
             # ppo_agent.policy.load_state_dict(torch.load(path)) #TODO policy OLD
 
 

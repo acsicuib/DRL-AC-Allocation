@@ -33,7 +33,7 @@ cd projects/DRL-AC-Allocation
 
 python -u "generate_dataset.py" --name E99_9 --n_devices 99 --n_jobs 9 --max_updates 100 --len_dataset 50
 
-nohup  python -u "train_ppo.py" --name E99_9 --n_devices 99 --n_jobs 9 --max_updates 150 --device cuda   > foo.out 2> foo.err < /dev/null &
+nohup  python -u "train_ppo.py" --name E99_9 --n_devices 99 --n_jobs 9 --max_updates 200 --device cuda   > foo.out 2> foo.err < /dev/null &
 
 		python -u "train_ppo.py" --name E99_9 --n_devices 99 --n_jobs 9 --max_updates 100 --device cuda
 
@@ -41,6 +41,9 @@ cat foo.out
 
 
 #PF
+nohup python -u "train_ppo_PF.py" --name E99_9 --n_devices 99 --n_jobs 9 --max_updates 60 --device cuda  > fooPF.out 2> fooPF.err < /dev/null &
+
+
 python -u "train_ppo_PF.py" --name E99_9 --n_devices 99 --n_jobs 9 --max_updates 100 --device cpu
 
 
