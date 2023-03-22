@@ -72,6 +72,8 @@ class PPO:
         
     def fromModel(self):
         self.optimizer = torch.optim.Adam(self.policy.parameters(), lr=configs.lr_agent)
+        self.policy_old =  deepcopy(self.policy)
+        self.policy_old.load_state_dict(self.policy.state_dict())
 
         self.scheduler = torch.optim.lr_scheduler.StepLR(self.optimizer,
                                                          step_size=configs.decay_step_size,
