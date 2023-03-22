@@ -1,14 +1,9 @@
 import torch
 import numpy as np
-import pickle
-from datetime import datetime
 
 from parameters import configs
 from environment.env import *
-from policy import PPO, Memory
-from instance_generator import one_instance_gen
 from models.dag_aggregate import dag_pool
-import pickle as pkl
 
 
 def validate_model(dataset, model):
@@ -54,7 +49,7 @@ def validate_model(dataset, model):
                 break
 
         log_rewards.append(ep_reward - env.posRewards)
-        # print(rewards - env.posRewards)
+        
     return np.array(log_rewards)
 
 

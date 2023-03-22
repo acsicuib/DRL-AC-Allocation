@@ -23,6 +23,8 @@ def main():
     print("\t + devices: ",configs.n_devices)
     print("\t + episodes: ",configs.max_updates)
 
+    codeW = str(int(configs.rewardWeightTime*10))+str(int(configs.rewardWeightCost*10))
+    print("\t Code: w",codeW)
 
     #TODO clean old vars
     torch.manual_seed(configs.torch_seed)
@@ -211,12 +213,16 @@ def main():
             validation_log.append(avg_reward_valid)
             if avg_reward_valid < record_reward_valid:
                 print("\t Storage a model %i"%(i_update+1))
-                torch.save(ppo_agent.policy.state_dict(), 'savedModels/{}.pth'.format(
-                        str(configs.name) + "_" +str(configs.n_jobs) + '_' + str(configs.n_devices)))
+                
+                torch.save(ppo_agent.policy.state_dict(), 'savedModels/%s_%s_%s_w%s.pth'%(str(configs.name),
+                                                                            str(configs.n_jobs),
+                                                                            str(configs.n_devices),
+                                                                            codeW
+                                                                            ))
                 record_reward_valid = avg_reward_valid
                 
                 file_writing_obj1 = open(
-                        'logs/vali_' + str(configs.name) +"_" + str(configs.n_jobs) + '_' + str(configs.n_devices) + '.txt', 'w')
+                        'logs/vali_' + str(configs.name) +"_w" + codeW + '.txt', 'w')
                 file_writing_obj1.write(str(validation_log))
                 file_writing_obj1.close()
 
@@ -225,11 +231,11 @@ def main():
 
     #Store the logs
     if configs.record_ppo:
-        with open('logs/log_ppo_'  + str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'.pkl', 'wb') as f:
+        with open('logs/log_ppo_'  + str(configs.name) + "_w" + codeW +'.pkl', 'wb') as f:
             pickle.dump(log, f)
     
     if configs.record_alloc:
-        with open('logs/log_ppo_alloc_'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'.pkl', 'wb') as f:
+        with open('logs/log_ppo_alloc_'+ str(configs.name) + "_w" + codeW +'.pkl', 'wb') as f:
             pickle.dump(logAlloc, f)
     
     

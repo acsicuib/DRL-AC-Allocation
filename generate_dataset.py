@@ -4,9 +4,11 @@ from parameters import configs
 import numpy as np
 import pickle as pkl
 
+CASE = "VALIDATION"
 
 CASE = "TEST"
-CASE = "VALIDATION"
+
+
 
 with open('datasets/dt_%s_%s_%i_%i.npz'%(CASE,configs.name,configs.n_jobs,configs.n_devices), 'wb') as f:
 

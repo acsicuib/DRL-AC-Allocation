@@ -13,6 +13,9 @@ E99_9 ########################
 ########################
 python -u "/Users/isaac/Projects/DRL-AC-Allocation/generate_dataset.py" --name E99_9 --n_devices 99 --n_jobs 9 --len_dataset 10 --np_seed_dataset 21032023
 
+python -u "/Users/isaac/Projects/DRL-AC-Allocation/generate_dataset.py" --name E99_9 --n_devices 99 --n_jobs 9 --len_dataset 50 --np_seed_dataset 73
+
+
 ########################
 ### GA
 ########################
@@ -23,13 +26,29 @@ python -u "/Users/isaac/Projects/DRL-AC-Allocation/eval_nsgaII.py" --name E99_9 
 ########################
 ssh isaac@172.30.248.28
 
+scp isaac@172.30.248.28
+
 pyenv activate DGLenv
 cd projects/DRL-AC-Allocation
 
 python -u "generate_dataset.py" --name E99_9 --n_devices 99 --n_jobs 9 --max_updates 100 --len_dataset 50
 
-nohup  python -u "train_ppo.py" --name E99_9 --n_devices 99 --n_jobs 9 --max_updates 100 --device cuda   > foo.out 2> foo.err < /dev/null &
+nohup  python -u "train_ppo.py" --name E99_9 --n_devices 99 --n_jobs 9 --max_updates 150 --device cuda   > foo.out 2> foo.err < /dev/null &
 
 		python -u "train_ppo.py" --name E99_9 --n_devices 99 --n_jobs 9 --max_updates 100 --device cuda
 
 cat foo.out
+
+
+#PF
+python -u "train_ppo_PF.py" --name E99_9 --n_devices 99 --n_jobs 9 --max_updates 100 --device cpu
+
+
+scp isaac@172.30.248.28:/home/isaac/projects/DRL-AC-Allocation/savedModels/E99_9_9_99.pth .
+
+
+#####
+EVAL
+#####
+
+python -u "eval_trained_ppo.py" --name E99_9 --n_devices 99 --n_jobs 9

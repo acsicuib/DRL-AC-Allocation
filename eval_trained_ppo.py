@@ -35,8 +35,19 @@ def main():
  
     # initialize a PPO agent
     ppo_agent = PPO(env.state_dim)
-    path = 'savedModels/{}.pth'.format(str(configs.name) + "_" +str(configs.n_jobs) + '_' + str(configs.n_devices))
-    ppo_agent.policy.load_state_dict(torch.load(path))
+    # path = 'savedModels/{}.pth'.format(str(configs.name) + "_" +str(configs.n_jobs) + '_' + str(configs.n_devices))
+    codeW = str(int(configs.rewardWeightTime*10))+str(int(configs.rewardWeightCost*10))
+    path = 'savedModels/%s_%s_%s_w%s.pth'%(str(configs.name),
+                                            str(configs.n_jobs),
+                                            str(configs.n_devices),
+                                            codeW
+                                            )
+    
+    if torch.cuda.is_available(): 
+        ppo_agent.policy.load_state_dict(torch.load(path)) #EXPERIMENTS FROM GPYU-server
+    else:
+        ppo_agent.policy.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
+
     # print(ppo_agent.policy)
 
     dag_pool_step = dag_pool(graph_pool_type=configs.graph_pool_type,
@@ -44,7 +55,7 @@ def main():
                              n_nodes=configs.n_tasks, device=device)
     
 
-    path_dt = 'datasets/dt_%s_%i_%i.npz'%(configs.name,configs.n_jobs,configs.n_devices)
+    path_dt = 'datasets/dt_TEST_%s_%i_%i.npz'%(configs.name,configs.n_jobs,configs.n_devices)
     dataset = np.load(path_dt)
     dataset = [dataset[key] for key in dataset]
     data = []
@@ -62,7 +73,8 @@ def main():
         state_fm = state[1]
         init_reward = - env.getRewardInit()
         ep_reward = - env.getRewardInit()
-        
+        init_time = env.max_endTime
+        init_cost = env.max_endCost 
         while True:
 
             adj_tensor_env = torch.from_numpy(adj).to(device).to_sparse()
@@ -91,10 +103,14 @@ def main():
         
         #TODO Take care log-size in case of large number of epochs 
         log.append([i, env.max_endTime,env.max_endCost,ep_reward])
-        print('Episode {} Time: {:.2f}\t Cost: {:.2f}\t reward: {:.2f} \t init Reward: {:.2f}'.
-              format(i + 1, env.max_endTime,env.max_endCost,ep_reward,init_reward))
-        
-       
+        print('Sample %i\tTime: %0.2f || %0.2f\t Cost: %.2f || %0.2f \t Reward: %.2f/%.2f'%(
+                i + 1,
+                init_time, env.max_endTime, 
+                init_cost, env.max_endCost,
+                ep_reward,init_reward
+        ))
+
+
         #TODO improve validation process
         # if (i_update + 1) % 100 == 0:#TODO 
     
