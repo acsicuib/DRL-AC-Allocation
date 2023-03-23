@@ -23,9 +23,9 @@ def main():
 
     midPoint = int(configs.rewardWeightTime*10)+1 #Model [5,5]
 
-    combinationsWeightTC = list(zip(weigthRange,weigthRange[::-1])) #[(0, 9), (1, 8), (2, 7), (3, 6), (4, 5), (5, 4), (6, 3), (7, 2), (8, 1), (9, 0)]
-    weightsToTime = combinationsWeightTC[midPoint:] #[(6, 4), (7, 3), (8, 2), (9, 1), (10, 0)]
-    weightsToCost = combinationsWeightTC[:midPoint-1][::-1] #[(4, 6), (3, 7), (2, 8), (1, 9), (0, 10)]
+    combinationsWeightTC = list(zip(weigthRange,weigthRange[::-1])) #[(0, 10), (1, 9), (2, 8), (3, 7), (4, 6), (5, 5), (6, 4), (7, 3), (8, 2), (9, 1), (10, 0)]
+    weightsToTime = combinationsWeightTC[midPoint:]
+    weightsToCost = combinationsWeightTC[:midPoint-1][::-1] 
 
     allCombination = [weightsToTime,weightsToCost]
     
@@ -42,7 +42,7 @@ def main():
     print("Loading Validation dataset, len: %i"%len(dataVali)) 
     
     
-    for weigths in allCombination:
+    for weigths in allCombination: #TODO parallelizable loop
         base_model_code = "55"
 
         for e,(wt,wc) in enumerate(weigths):
@@ -51,8 +51,8 @@ def main():
             # print(".")
             configs.rewardWeightTime = wt/10.
             configs.rewardWeightCost = wc/10.
-            print(configs.rewardWeightCost)
-            print(configs.rewardWeightTime)
+            # print(configs.rewardWeightCost)
+            # print(configs.rewardWeightTime)
 
             
             codeW = str(int(configs.rewardWeightTime*10))+str(int(configs.rewardWeightCost*10))

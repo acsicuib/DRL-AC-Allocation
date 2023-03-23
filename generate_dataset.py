@@ -4,9 +4,15 @@ from parameters import configs
 import numpy as np
 import pickle as pkl
 
+
 CASE = "VALIDATION"
 
+
+
 CASE = "TEST"
+
+
+
 
 
 

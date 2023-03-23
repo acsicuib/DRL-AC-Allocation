@@ -28,15 +28,22 @@ def one_instance_gen(n_jobs,n_devices,cloud_features,dependency_degree):
 
 if __name__ == '__main__':
     print("Test one_instance_gen function")
-
-    n_jobs = 3
-    n_devices = 5 # In total = 5+1, cloud entity
-    cloud_features = [20,10,4,0]
+    n_jobs = 5
+    n_devices = 999 # In total = 5+1, cloud entity
+    # cloud_features = [20,10,4,0]
+    cloud_features = configs.cloud_features
     degree = 0.2
     for i in range(10):
         times, adj,feat = one_instance_gen(n_jobs,n_devices,cloud_features,degree)
         print("Times: \n",times)
         print("AdjM: \n",adj)
-        print("Feat: %s\n"%configs.feature_labels,feat)
+        # print("Feat: %s\n"%configs.feature_labels,feat)
         # print(times),adj,feat)
         print("-"*40)
+
+        v,c = np.unique(feat[:,1],return_counts=True)
+        print(v,"\n",c)
+        v,c = np.unique(feat[:,2],return_counts=True)
+        print(v,"\n",c)
+
+        break
