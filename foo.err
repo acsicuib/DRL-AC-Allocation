@@ -1,0 +1,25 @@
+Traceback (most recent call last):
+  File "/Users/isaac/Projects/DRL-AC-Allocation/train_ppo.py", line 249, in <module>
+    main()
+  File "/Users/isaac/Projects/DRL-AC-Allocation/train_ppo.py", line 41, in main
+    ppo_agent = PPO(envs[0].state_dim)
+  File "/Users/isaac/Projects/DRL-AC-Allocation/policy.py", line 60, in __init__
+    self.policy = ActorCritic(state_dim,device)
+  File "/Users/isaac/Projects/DRL-AC-Allocation/models/doubleActorCritic.py", line 17, in __init__
+    self.feature_extract = GraphCNN(num_layers=configs.num_layers,
+  File "/Users/isaac/.pyenv/versions/DGLenv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 987, in to
+    return self._apply(convert)
+  File "/Users/isaac/.pyenv/versions/DGLenv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 639, in _apply
+    module._apply(fn)
+  File "/Users/isaac/.pyenv/versions/DGLenv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 639, in _apply
+    module._apply(fn)
+  File "/Users/isaac/.pyenv/versions/DGLenv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 639, in _apply
+    module._apply(fn)
+  [Previous line repeated 1 more time]
+  File "/Users/isaac/.pyenv/versions/DGLenv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 662, in _apply
+    param_applied = fn(param)
+  File "/Users/isaac/.pyenv/versions/DGLenv/lib/python3.9/site-packages/torch/nn/modules/module.py", line 985, in convert
+    return t.to(device, dtype if t.is_floating_point() or t.is_complex() else None, non_blocking)
+  File "/Users/isaac/.pyenv/versions/DGLenv/lib/python3.9/site-packages/torch/cuda/__init__.py", line 221, in _lazy_init
+    raise AssertionError("Torch not compiled with CUDA enabled")
+AssertionError: Torch not compiled with CUDA enabled

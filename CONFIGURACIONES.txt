@@ -41,13 +41,29 @@ cat foo.out
 
 
 #PF
-nohup python -u "train_ppo_PF.py" --name E99_9 --n_devices 99 --n_jobs 9 --max_updates 60 --device cuda  > fooPF.out 2> fooPF.err < /dev/null &
+nohup python -u "train_ppo_PF.py" --name E99_9 --n_devices 99 --n_jobs 9 --max_updates 100 --device cuda  > fooPF.out 2> fooPF.err < /dev/null &
 
 
-python -u "train_ppo_PF.py" --name E99_9 --n_devices 99 --n_jobs 9 --max_updates 100 --device cpu
+python -u "train_ppo_PF.py" --name E99_9 --n_devices 99 --n_jobs 9 --max_updates 50 --device cpu
 
 
-scp isaac@172.30.248.28:/home/isaac/projects/DRL-AC-Allocation/savedModels/E99_9_9_99.pth .
+scp isaac@172.30.248.28:/home/isaac/projects/DRL-AC-Allocation/savedModels/E99_9_9_99_w55.pth .
+
+
+scp isaac@172.30.248.28:/home/isaac/projects/DRL-AC-Allocation/savedModels/E99_9_9_99_w010.pth .
+
+
+scp isaac@172.30.248.28:/home/isaac/projects/DRL-AC-Allocation/savedModels/E99_9_9_99_w19.pth .
+scp isaac@172.30.248.28:/home/isaac/projects/DRL-AC-Allocation/savedModels/E99_9_9_99_w28.pth .
+scp isaac@172.30.248.28:/home/isaac/projects/DRL-AC-Allocation/savedModels/E99_9_9_99_w37.pth .
+scp isaac@172.30.248.28:/home/isaac/projects/DRL-AC-Allocation/savedModels/E99_9_9_99_w46.pth .
+
+scp isaac@172.30.248.28:/home/isaac/projects/DRL-AC-Allocation/savedModels/E99_9_9_99_w64.pth .
+scp isaac@172.30.248.28:/home/isaac/projects/DRL-AC-Allocation/savedModels/E99_9_9_99_w73.pth .
+scp isaac@172.30.248.28:/home/isaac/projects/DRL-AC-Allocation/savedModels/E99_9_9_99_w82.pth .
+scp isaac@172.30.248.28:/home/isaac/projects/DRL-AC-Allocation/savedModels/E99_9_9_99_w91.pth .
+scp isaac@172.30.248.28:/home/isaac/projects/DRL-AC-Allocation/savedModels/E99_9_9_99_w100.pth .
+
 
 
 #####
@@ -55,3 +71,9 @@ EVAL
 #####
 
 python -u "eval_trained_ppo.py" --name E99_9 --n_devices 99 --n_jobs 9
+
+
+
+python -u "eval_trained_PF_ppo.py" --name E99_9 --n_devices 99 --n_jobs 9
+
+
