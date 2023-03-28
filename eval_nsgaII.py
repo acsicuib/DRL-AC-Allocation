@@ -46,6 +46,7 @@ def main():
                                    n_devices=configs.n_devices,
                                    n_tasks=configs.n_tasks) 
 
+        sttime = datetime.now().replace(microsecond=0)
         res = minimize(problem,
                     algorithm,
                     termination,
@@ -57,8 +58,10 @@ def main():
         for pf in res.F:
             log_pf.append([i,pf[0],pf[1],res.exec_time])
 
-        print('\tEpisode {}\t Len PF: {}\t exec time {:.2f}'.format(i + 1, len(res.F), res.exec_time))
-
+        ettime = datetime.now().replace(microsecond=0)
+        print('\tEpisode {}\t Len PF: {}\t exec time {:.2f}'.format(i + 1, len(res.F), res.time))
+        print("\t\t time: ",(ettime-sttime))
+        
         with open('logs/log_ga_pf_'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'_%i.pkl'%i, 'wb') as f:
                 pickle.dump(log_pf, f)
 

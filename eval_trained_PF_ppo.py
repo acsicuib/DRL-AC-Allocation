@@ -18,10 +18,15 @@ device = torch.device(configs.device)
 
 def main():
 
+    torch.manual_seed(configs.torch_seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(configs.torch_seed)
+    np.random.seed(configs.np_seed_train)
 
-    weigthRange = list(range(11))
+    weigthRange = list(np.arange(0,11,2.5))
     combinationsWeightTC = list(zip(weigthRange,weigthRange[::-1])) #[(0, 10), (1, 9), (2, 8), (3, 7), (4, 6), (5, 5), (6, 4), (7, 3), (8, 2), (9, 1), (10, 0)]
-
+    combinationsWeightTC = [(0.0, 10.0), (5.0, 5.0)]
+    # combinationsWeightTC = [(0.0, 10.0), (2.5, 7.5), (5.0, 5.0), (7.5, 2.5), (10.0, 0.0)]
     print(combinationsWeightTC)
 
     ## TEST Dataset
@@ -49,13 +54,13 @@ def main():
         print("C",configs.rewardWeightCost)
         
 
-        codeW = str(int(configs.rewardWeightTime*10))+str(int(configs.rewardWeightCost*10))
-        codeW ="010"
-        configs.rewardWeightTime = 1.
-        configs.rewardWeightCost = .0
+        codeW = str(int(configs.rewardWeightTime*100))+str(int(configs.rewardWeightCost*100))
+        # codeW ="0100"
+        # configs.rewardWeightTime = 0.0
+        # configs.rewardWeightCost = 1.0
         
         print("Model combination: _w",codeW)
-
+        
 
 
         env = SPP(number_jobs=configs.n_jobs, number_devices=configs.n_devices,number_features=number_all_device_features) 
@@ -127,7 +132,7 @@ def main():
                     ep_reward,init_reward
             ))
 
-        break
+        # break
     if configs.record_alloc:
         with open('logs/log_eval_PF_'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'.pkl', 'wb') as f:
             pickle.dump(log, f)
