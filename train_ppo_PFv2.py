@@ -19,7 +19,7 @@ device = torch.device(configs.device)
 
 def main():
 
-    weigthRange = list(np.arange(0,11,2.5))
+    weigthRange = list(range(11))
 
     midPoint = int(configs.rewardWeightTime*10)+1 #Model [5,5]
 
@@ -51,13 +51,13 @@ def main():
             # print(".")
             configs.rewardWeightTime = wt/10.
             configs.rewardWeightCost = wc/10.
-            print(configs.rewardWeightCost)
-            print(configs.rewardWeightTime)
+            # print(configs.rewardWeightCost)
+            # print(configs.rewardWeightTime)
 
             
-            codeW = str(int(configs.rewardWeightTime*100))+str(int(configs.rewardWeightCost*100))
+            codeW = str(int(configs.rewardWeightTime*10))+str(int(configs.rewardWeightCost*10))
             
-            print(codeW)
+            
             print("Training model T %f  C %f"%(configs.rewardWeightTime,configs.rewardWeightCost))
             
 
@@ -283,7 +283,7 @@ def main():
             
             
             print("Done: _w%s\n"%base_model_code)
-            base_model_code = str(int(configs.rewardWeightTime*100))+str(int(configs.rewardWeightCost*100))
+            base_model_code = "55"
             # break
         
         # break

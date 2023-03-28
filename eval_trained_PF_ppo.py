@@ -26,6 +26,7 @@ def main():
 
     ## TEST Dataset
     path_dt = 'datasets/dt_TEST_%s_%i_%i.npz'%(configs.name,configs.n_jobs,configs.n_devices)
+    # path_dt = 'datasets/dt_VALIDATION_%s_%i_%i.npz'%(configs.name,configs.n_jobs,configs.n_devices)
     dataset = np.load(path_dt)
     dataset = [dataset[key] for key in dataset]
     data = []
@@ -41,14 +42,21 @@ def main():
 
     log = []
 
-    for e,(wt,wc) in enumerate(combinationsWeightTC):
+    for e,(wt,wc) in enumerate(combinationsWeightTC[::-1]):
         configs.rewardWeightTime = wt/10.
         configs.rewardWeightCost = wc/10.
-        # print(configs.rewardWeightCost)
-        # print(configs.rewardWeightTime)
-    
+        print("T",configs.rewardWeightTime)
+        print("C",configs.rewardWeightCost)
+        
+
         codeW = str(int(configs.rewardWeightTime*10))+str(int(configs.rewardWeightCost*10))
+        codeW ="010"
+        configs.rewardWeightTime = 1.
+        configs.rewardWeightCost = .0
+        
         print("Model combination: _w",codeW)
+
+
 
         env = SPP(number_jobs=configs.n_jobs, number_devices=configs.n_devices,number_features=number_all_device_features) 
  
@@ -60,6 +68,7 @@ def main():
                                             str(configs.n_devices),
                                             codeW
                                             )
+        print(" Loading path : ",path)
 
         if torch.cuda.is_available(): 
             ppo_agent.policy.load_state_dict(torch.load(path)) #EXPERIMENTS FROM GPYU-server
@@ -118,7 +127,7 @@ def main():
                     ep_reward,init_reward
             ))
 
-
+        break
     if configs.record_alloc:
         with open('logs/log_eval_PF_'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'.pkl', 'wb') as f:
             pickle.dump(log, f)

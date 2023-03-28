@@ -5,15 +5,40 @@ E999_9 ########################
 #Validation
 python -u "generate_dataset.py" --name E999_9 --n_devices 999 --n_jobs 9 --len_dataset 150 --np_seed_dataset 2023
 
+scp dt_VALIDATION_E999_9_9_999.npz isaac@172.30.248.28:~/projects/DRL-AC-Allocation/datasets/. 
+
+
 #Test
 python -u "generate_dataset.py" --name E999_9 --n_devices 999 --n_jobs 9 --len_dataset 50 --np_seed_dataset 23290
 
 
-#### TRAIN
+#### TRAIN 5.5.
 
 nohup python -u "train_ppo.py" --name E999_9 --n_devices 999 --n_jobs 9 --max_updates 150 --device cuda > foo.out 2> foo.err < /dev/null &
+
+python -u "train_ppo.py" --name E999_9 --n_devices 999 --n_jobs 9 --max_updates 10
 
 
 #### TRAIN PF
 
-nohup python -u "train_ppo_PF.py" --name E999_9 --n_devices 999 --n_jobs 9 --max_updates 100 --device cuda  > fooPF.out 2> fooPF.err < /dev/null &
+nohup python -u "train_ppo_PF.py" --name E999_9 --n_devices 999 --n_jobs 9 --max_updates 50 --device cuda  > fooPF.out 2> fooPF.err < /dev/null &
+
+## EVAL
+python -u "eval_trained_PF_ppo.py" --name E999_9 --n_devices 999 --n_jobs 9
+
+scp isaac@172.30.248.28:/home/isaac/projects/DRL-AC-Allocation/fooE999_55.out .
+
+
+####
+A
+nohup python -u "train_ppo.py" --name E999_9 --n_devices 999 --n_jobs 9 --max_updates 130 --device cpu --rewardWeightCost 1.0 --rewardWeightTime 0.0 --device cuda > fooA.out 2> fooA.err < /dev/null &
+
+B
+nohup python -u "train_ppo.py" --name E999_9 --n_devices 999 --n_jobs 9 --max_updates 130 --device cpu --rewardWeightCost 0.75 --rewardWeightTime 0.25 --device cuda > fooB.out 2> fooB.err < /dev/null &
+
+C
+nohup python -u "train_ppo.py" --name E999_9 --n_devices 999 --n_jobs 9 --max_updates 130 --device cpu --rewardWeightCost 0.25 --rewardWeightTime 0.75 --device cuda > fooC.out 2> fooC.err < /dev/null &
+
+D
+nohup python -u "train_ppo.py" --name E999_9 --n_devices 999 --n_jobs 9 --max_updates 130 --device cpu --rewardWeightCost 0.0 --rewardWeightTime 1.0 --device cuda > fooD.out 2> fooD.err < /dev/null &
+

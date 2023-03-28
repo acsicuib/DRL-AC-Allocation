@@ -23,7 +23,7 @@ def main():
     print("\t + devices: ",configs.n_devices)
     print("\t + episodes: ",configs.max_updates)
 
-    codeW = str(int(configs.rewardWeightTime*10))+str(int(configs.rewardWeightCost*10))
+    codeW = str(int(configs.rewardWeightTime*100))+str(int(configs.rewardWeightCost*100))
     print("\t Code: w",codeW)
 
     #TODO clean old vars
@@ -44,6 +44,7 @@ def main():
     dag_pool_step = dag_pool(graph_pool_type=configs.graph_pool_type,
                              batch_size=torch.Size([1, configs.n_tasks, configs.n_tasks]),
                              n_nodes=configs.n_tasks, device=device)
+    
     
     ### Validate date
     path_dt = 'datasets/dt_VALIDATION_%s_%i_%i.npz'%(configs.name,configs.n_jobs,configs.n_devices)

@@ -71,13 +71,13 @@ class PPO:
         self.MseLoss = torch.nn.MSELoss()
         
     def fromModel(self):
-        self.optimizer = torch.optim.Adam(self.policy.parameters(), lr=configs.lr_agent)
+        # self.optimizer = torch.optim.Adam(self.policy.parameters(), lr=configs.lr_agent)
         self.policy_old =  deepcopy(self.policy)
         self.policy_old.load_state_dict(self.policy.state_dict())
 
-        self.scheduler = torch.optim.lr_scheduler.StepLR(self.optimizer,
-                                                         step_size=configs.decay_step_size,
-                                                         gamma=configs.decay_ratio)
+        # self.scheduler = torch.optim.lr_scheduler.StepLR(self.optimizer,
+                                                        #  step_size=configs.decay_step_size,
+                                                        #  gamma=configs.decay_ratio)
     def update(self,memories):
         vloss_coef = configs.vloss_coef
         ploss_coef = configs.ploss_coef
