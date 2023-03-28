@@ -14,7 +14,7 @@ Config.warnings['not_compiled'] = False
 def main():
     np.random.seed(configs.np_seed_train)
     
-    path_dt = 'datasets/dt_%s_%i_%i.npz'%(configs.name,configs.n_jobs,configs.n_devices)
+    path_dt = 'datasets/dt_TEST_%s_%i_%i.npz'%(configs.name,configs.n_jobs,configs.n_devices)
     dataset = np.load(path_dt)
     dataset = [dataset[key] for key in dataset]
     data = []
@@ -25,17 +25,17 @@ def main():
                      ))
     
     algorithm = NSGA2(
-        pop_size=100,
+        pop_size=200,
         sampling=MySampling(),
-        crossover=BinaryCrossover(prob_mutation=.08), #TODO remove prob_mutation !!BUG?
+        crossover=BinaryCrossover(prob_mutation=.15), #TODO remove prob_mutation !!BUG?
         mutation=MyMutation(prob=.0), #TODO fix prob
         eliminate_duplicates=True
     )
 
     termination = get_termination("n_gen", configs.n_gen)
 
-    log_pf = []
     for i, sample  in enumerate(data):
+        
         print("Running episode: %i"%(i+1))
         times, adj, feat = sample
         problem = PlacementProblem(n_var=(configs.n_devices+1)*configs.n_tasks,
@@ -52,15 +52,15 @@ def main():
                     seed=1,
                     save_history=True,
                     verbose=False)
-
+        
+        log_pf = []
         for pf in res.F:
             log_pf.append([i,pf[0],pf[1],res.exec_time])
 
         print('\tEpisode {}\t Len PF: {}\t exec time {:.2f}'.format(i + 1, len(res.F), res.exec_time))
 
-    if True:
-        with open('logs/log_ga_pf_'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'.pkl', 'wb') as f:
-            pickle.dump(log_pf, f)
+        with open('logs/log_ga_pf_'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'_%i.pkl'%i, 'wb') as f:
+                pickle.dump(log_pf, f)
 
 if __name__ == '__main__':
     print("NSGAII-strategy test: using default parameters")
