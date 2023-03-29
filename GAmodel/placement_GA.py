@@ -53,7 +53,7 @@ class MonoPlacementProblem(ElementwiseProblem):
         sample = x.reshape(self.number_devices,self.n_tasks)
         f1 = np.sum(getCNTimes(sample,self.executions,self.featHW,self.adj))
         f2 = np.sum(getCNCosts(sample,self.featHW))
-        fx = self.wTime*f1 + self.wCost*f2
+        fx = self.wTime*f1 + ((self.wCost/3)*f2)
 
         g1 = np.sum(np.abs(np.sum(sample,axis=0) - np.ones(shape=(self.n_tasks),dtype=np.uint8)))
        

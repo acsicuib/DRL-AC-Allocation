@@ -2,6 +2,7 @@
 E999_9 ########################
 ########################################################################
 
+
 #Validation
 python -u "generate_dataset.py" --name E999_9 --n_devices 999 --n_jobs 9 --len_dataset 150 --np_seed_dataset 2023
 
@@ -20,13 +21,22 @@ nohup python -u "train_ppo.py" --name E999_9 --n_devices 999 --n_jobs 9 --max_up
 python -u "train_ppo.py" --name E999_9 --n_devices 999 --n_jobs 9 --max_updates 10
 
 #### EVAL NSGA
+pyenv activate DGLenv
 scp dt_TEST_E999_9_9_999.npz isaac@cloudlab:~/projects/DRL-AC-Allocation/datasets/. 
-nohup python -u "eval_nsgaII.py" --name E999_9 --n_devices 999 --n_jobs 9 --n_gen 100 > foo.out 2> feo.err < /dev/null &
-	
 
-[1] 43955
+nohup python -u "eval_nsgaII.py" --name E999_9 --n_devices 999 --n_jobs 9 --n_gen 100 > foo.out 2> feo.err < /dev/null &
+
+#by case	
+scp isaac@cloudlab:~/projects/DRL-AC-Allocation/logs/log_ga_pf_E999_9_9_999_0.pkl . 
+
+
+#### EVAL NSGA MONO
 
 nohup python -u "eval_nsgaII_mono.py" --name E999_9 --n_devices 999 --n_jobs 9 --n_gen 100 > fM.out 2> feM.err < /dev/null &
+47544
+
+#by case
+scp isaac@cloudlab:~/projects/DRL-AC-Allocation/logs/log_ga_pf_mono_E999_9_9_999_0.pkl . 
 
 
 ##### EVAL_MOEAD
