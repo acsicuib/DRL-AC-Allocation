@@ -14,6 +14,14 @@ Config.warnings['not_compiled'] = False
 def main():
     np.random.seed(configs.np_seed_train)
     
+    ## DEBUG
+    # configs.name ="E999_9"
+    # configs.n_devices = 999
+    # configs.n_jobs = 9
+    # configs.n_tasks = 81
+    # configs.n_gen = 4
+
+
     path_dt = 'datasets/dt_TEST_%s_%i_%i.npz'%(configs.name,configs.n_jobs,configs.n_devices)
     dataset = np.load(path_dt)
     dataset = [dataset[key] for key in dataset]
@@ -58,16 +66,19 @@ def main():
         
         ettime = datetime.now().replace(microsecond=0)
 
+        print(res.X)
+        solution = problem.myevaluate(res.X)
+
         log_pf = []
         for pf in res.F:
-            log_pf.append([i,pf,(ettime-sttime)])
+            log_pf.append([i,pf,solution[0],solution[1],solution[2],(ettime-sttime)])
 
         with open('logs/log_ga_pf_mono_'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'_%i.pkl'%i, 'wb') as f:
                 pickle.dump(log_pf, f)
                 
         print('\tEpisode {}\t Len PF: {}\t'.format(i + 1, len(res.F)))
         # print("\t\t time: ",(ettime-sttime))
-
+        # break
         
 
 if __name__ == '__main__':

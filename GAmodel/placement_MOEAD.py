@@ -5,8 +5,8 @@ from pymoo.core.mutation import Mutation
 from pymoo.core.sampling import Sampling
 from environment.utils import getCNTimes,getCNCosts
 
-class PlacementProblem(ElementwiseProblem):
-    def __init__(self,n_var,n_objectives,time,adj,featHW,n_devices,n_tasks):
+class PlacementProblemMOEAD(ElementwiseProblem):
+    def __init__(self,n_var,n_objectives,time,adj,featHW,n_devices,n_tasks,wTime,wCost):
         super().__init__(
             n_var = n_var,
             n_obj=n_objectives,
@@ -14,6 +14,10 @@ class PlacementProblem(ElementwiseProblem):
             )
         self.number_devices = n_devices+1 
         self.n_tasks = n_tasks 
+
+        self.wTime = wTime
+        self.wCost = wCost
+
 
         ## One Infraestructure, and one App
         self.executions = time
@@ -24,10 +28,13 @@ class PlacementProblem(ElementwiseProblem):
         sample = x.reshape(self.number_devices,self.n_tasks)
         f1 = np.sum(getCNTimes(sample,self.executions,self.featHW,self.adj))
         f2 = np.sum(getCNCosts(sample,self.featHW))
-       
+        fx = self.wTime*f1 + self.wCost*f2
+        # out["F"] = [fx]
         out["F"] = [f1,f2]
 
-
+    def has_constraints(self):
+        return False        
+    
 class MySampling(Sampling):
 
     

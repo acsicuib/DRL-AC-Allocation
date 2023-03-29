@@ -23,9 +23,10 @@ python -u "train_ppo.py" --name E999_9 --n_devices 999 --n_jobs 9 --max_updates 
 scp dt_TEST_E999_9_9_999.npz isaac@cloudlab:~/projects/DRL-AC-Allocation/datasets/. 
 nohup python -u "eval_nsgaII.py" --name E999_9 --n_devices 999 --n_jobs 9 --n_gen 100 > foo.out 2> feo.err < /dev/null &
 	
-	
 
- 42293
+[1] 43955
+
+nohup python -u "eval_nsgaII_mono.py" --name E999_9 --n_devices 999 --n_jobs 9 --n_gen 100 > fM.out 2> feM.err < /dev/null &
 
 
 ##### EVAL_MOEAD
@@ -45,38 +46,32 @@ scp isaac@cloudlab:~/projects/DRL-AC-Allocation/logs/log_ga_pf_E999_9_9_999_0.pk
 
 ####
 A
-nohup python -u "train_ppo.py" --name E999_9 --n_devices 999 --n_jobs 9 --max_updates 100 --device cpu --rewardWeightCost 1.0 --rewardWeightTime 0.0 --device cuda --record_alloc_episodes [0,10,20,30] > fooA.out 2> fooA.err < /dev/null &
+nohup python -u "train_ppo.py" --name E999v2_9 --n_devices 999 --n_jobs 9 --max_updates 150 --device cpu --rewardWeightCost 1.0 --rewardWeightTime 0.0 --device cuda --record_alloc_episodes 0 10 20 30  > fooA2.out 2> fooA2.err < /dev/null &
 
 scp isaac@172.30.248.28:/home/isaac/projects/DRL-AC-Allocation/savedModels/E999_9_9_999_w0100.pth .
-		
+scp isaac@172.30.248.28:/home/isaac/projects/DRL-AC-Allocation/savedModels/E999v2_9_9_999_w0100.pth .
 
-			Episode 30 Last reward: -1326.79	 Mean_Vloss: 3.60958505	 Init reward: -1620.00	 Init Time: 399.12	 Time: 2261.95
- 			Init Cost: 1620.00	 Cost: 740.38
-	 		Storage a model 30
+2900120
 
 
 B
-nohup python -u "train_ppo.py" --name E999_9 --n_devices 999 --n_jobs 9 --max_updates 100 --device cpu --rewardWeightCost 0.75 --rewardWeightTime 0.25 --device cuda > fooB.out 2> feoB.err < /dev/null &
- 1142572
-
+nohup python -u "train_ppo.py" --name E999v2_9 --n_devices 999 --n_jobs 9 --max_updates 150 --device cpu --rewardWeightCost 0.75 --rewardWeightTime 0.25 --device cuda > fooB.out 2> feoB.err < /dev/null &
 
 scp isaac@172.30.248.28:/home/isaac/projects/DRL-AC-Allocation/savedModels/E999_9_9_999_w2575.pth .
+scp isaac@172.30.248.28:/home/isaac/projects/DRL-AC-Allocation/savedModels/E999v2_9_9_999_w2575.pth .
 
 
 C
-nohup python -u "train_ppo.py" --name E999_9 --n_devices 999 --n_jobs 9 --max_updates 100 --device cpu --rewardWeightCost 0.25 --rewardWeightTime 0.75 --device cuda > fooC.out 2> feoC.err < /dev/null &
-
-1219894
+nohup python -u "train_ppo.py" --name E999v2_9 --n_devices 999 --n_jobs 9 --max_updates 100 --device cpu --rewardWeightCost 0.25 --rewardWeightTime 0.75 --device cuda > fooC.out 2> feoC.err < /dev/null &
 
 scp isaac@172.30.248.28:/home/isaac/projects/DRL-AC-Allocation/savedModels/E999_9_9_999_w7525.pth .
+scp isaac@172.30.248.28:/home/isaac/projects/DRL-AC-Allocation/savedModels/E999v2_9_9_999_w7525.pth .
+
 
 
 D
-
 nohup python -u "train_ppo.py" --name E999_9 --n_devices 999 --n_jobs 9 --max_updates 100 --device cpu --rewardWeightCost 0.0 --rewardWeightTime 1.0 --device cuda --record_alloc_episodes 0 10 20 30  > fooD.out 2> feoD.err < /dev/null &
 
-1316889
-
 scp isaac@172.30.248.28:/home/isaac/projects/DRL-AC-Allocation/savedModels/E999_9_9_999_w1000.pth .
-
+scp isaac@172.30.248.28:/home/isaac/projects/DRL-AC-Allocation/savedModels/E999v2_9_9_999_w1000.pth .
 

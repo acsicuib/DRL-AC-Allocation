@@ -6,7 +6,7 @@ from pymoo.util.ref_dirs import get_reference_directions
 
 import sys
 from parameters import configs
-from GAmodel.placement_MOEAD import MyMutation,MySampling,PlacementProblem,BinaryCrossover
+from GAmodel.placement_MOEAD import MyMutation,MySampling,PlacementProblemMOEAD,BinaryCrossover
 import pickle
 from datetime import datetime
 
@@ -16,7 +16,17 @@ Config.warnings['not_compiled'] = False
 def main():
     np.random.seed(configs.np_seed_train)
     
+    configs.name ="E999_9"
+    configs.n_devices = 999
+    configs.n_jobs = 9
+    configs.n_tasks = 81
+    configs.n_gen = 100
+
     path_dt = 'datasets/dt_TEST_%s_%i_%i.npz'%(configs.name,configs.n_jobs,configs.n_devices)
+    
+    
+    # path_dt = 'datasets/dt_TEST_E999_9_9_999.npz'
+    
     dataset = np.load(path_dt)
     dataset = [dataset[key] for key in dataset]
     data = []
@@ -26,13 +36,16 @@ def main():
                      dataset[2][sample],
                      ))
     
-    ref_dirs = get_reference_directions("uniform", 2, n_partitions=12)
+    ref_dirs = get_reference_directions("uniform", 2, n_partitions=15)
     # print(ref_dirs)
    
     algorithm = MOEAD(
         ref_dirs,
-        n_neighbors=15,
+        n_neighbors=50,
         prob_neighbor_mating=0.7,
+        sampling=MySampling(),
+        crossover=BinaryCrossover(prob_mutation=.15), #TODO remove prob_mutation !!BUG?
+        mutation=MyMutation(prob=.0), #TODO fix prob
     )
     
 
@@ -42,13 +55,15 @@ def main():
         
         print("Running episode: %i"%(i+1))
         times, adj, feat = sample
-        problem = PlacementProblem(n_var=(configs.n_devices+1)*configs.n_tasks,
+        problem = PlacementProblemMOEAD(n_var=(configs.n_devices+1)*configs.n_tasks,
                                    n_objectives=2, #TODO fix 2 funciones objetivos
                                    time=times,
                                    adj=adj,
                                    featHW=feat,
                                    n_devices=configs.n_devices,
-                                   n_tasks=configs.n_tasks) 
+                                   n_tasks=configs.n_tasks,
+                                   wTime=configs.rewardWeightTime, 
+                                   wCost=configs.rewardWeightCost) 
 
         sttime = datetime.now().replace(microsecond=0)
         res = minimize(problem,
@@ -61,8 +76,14 @@ def main():
         ettime = datetime.now().replace(microsecond=0)
         
         log_pf = []
-        for pf in res.F:
-            log_pf.append([i,pf[0],pf[1],str((ettime-sttime))])
+        # for pf in res.F:
+        print(res.F)
+        
+        print(res.pf)
+        print(res)
+        print(dir(res))
+        sys.exit()
+        log_pf.append([i,pf[0],pf[1],str((ettime-sttime))])
 
         with open('logs/log_moead_pf_'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'_%i.pkl'%i, 'wb') as f:
                 pickle.dump(log_pf, f)
