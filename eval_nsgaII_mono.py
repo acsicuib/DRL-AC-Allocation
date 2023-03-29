@@ -67,10 +67,11 @@ def main():
         ettime = datetime.now().replace(microsecond=0)
 
         print(res.X)
-        solution = problem.myevaluate(res.X)
+        
 
         log_pf = []
-        for pf in res.F:
+        for ix,pf in enumerate(res.F):
+            solution = problem.myevaluate(res.X[ix])
             log_pf.append([i,pf,solution[0],solution[1],solution[2],(ettime-sttime)])
 
         with open('logs/log_ga_pf_mono_'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'_%i.pkl'%i, 'wb') as f:
