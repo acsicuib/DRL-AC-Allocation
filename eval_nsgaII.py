@@ -55,17 +55,18 @@ def main():
                     verbose=False)
         
         ettime = datetime.now().replace(microsecond=0)
-        
+
         log_pf = []
         for pf in res.F:
             log_pf.append([i,pf[0],pf[1],(ettime-sttime)])
 
-        
-        print('\tEpisode {}\t Len PF: {}\t exec time {:.2f}'.format(i + 1, len(res.F), (ettime-sttime)))
+        with open('logs/log_ga_pf__mono_'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'_%i.pkl'%i, 'wb') as f:
+                pickle.dump(log_pf, f)
+                
+        print('\tEpisode {}\t Len PF: {}\t'.format(i + 1, len(res.F)))
         print("\t\t time: ",(ettime-sttime))
 
-        with open('logs/log_ga_pf_'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'_%i.pkl'%i, 'wb') as f:
-                pickle.dump(log_pf, f)
+        
 
 if __name__ == '__main__':
     print("NSGAII-strategy test: using default parameters")
