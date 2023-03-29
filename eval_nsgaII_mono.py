@@ -46,7 +46,7 @@ def main():
                                    n_devices=configs.n_devices,
                                    n_tasks=configs.n_tasks,
                                    wTime=configs.rewardWeightTime, 
-                                   wCost=configs.rewardWeighCost) 
+                                   wCost=configs.rewardWeightCost) 
 
         sttime = datetime.now().replace(microsecond=0)
         res = minimize(problem,
