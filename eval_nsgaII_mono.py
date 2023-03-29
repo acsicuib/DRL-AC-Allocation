@@ -39,7 +39,7 @@ def main():
         print("Running episode: %i"%(i+1))
         times, adj, feat = sample
         problem = MonoPlacementProblem(n_var=(configs.n_devices+1)*configs.n_tasks,
-                                   n_objectives=2, #TODO fix 2 funciones objetivos
+                                   n_objectives=1, #TODO fix 2 funciones objetivos
                                    time=times,
                                    adj=adj,
                                    featHW=feat,
@@ -60,7 +60,7 @@ def main():
 
         log_pf = []
         for pf in res.F:
-            log_pf.append([i,pf[0],(ettime-sttime)])
+            log_pf.append([i,pf,(ettime-sttime)])
 
         with open('logs/log_ga_pf_mono_'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'_%i.pkl'%i, 'wb') as f:
                 pickle.dump(log_pf, f)
