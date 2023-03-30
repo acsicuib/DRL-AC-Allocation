@@ -69,19 +69,22 @@ def main():
         print(res.X)
         print(res.X.shape)
         
-
-        log_pf = []
-        for ix,pf in enumerate(res.F):
-            if len(res.X.shape)>2:
+        try:
+            log_pf = []
+            for ix,pf in enumerate(res.F):
                 
-                solution = problem.myevaluate(res.X[ix])
-            else:
-                solution = problem.myevaluate(res.X)
+                if len(res.X.shape)>2:
+                    
+                    solution = problem.myevaluate(res.X[ix])
+                else:
+                    solution = problem.myevaluate(res.X)
 
-            log_pf.append([i,pf,solution[0],solution[1],solution[2],(ettime-sttime)])
+                log_pf.append([i,pf,solution[0],solution[1],solution[2],(ettime-sttime)])
 
-        with open('logs/log_ga_pf_mono_'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'_%i.pkl'%i, 'wb') as f:
-                pickle.dump(log_pf, f)
+            with open('logs/log_ga_pf_mono_'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'_%i.pkl'%i, 'wb') as f:
+                    pickle.dump(log_pf, f)
+        except:
+            print("Problem with CASE %i"%i)
                 
         print('\tEpisode {}\t Len PF: {}\t'.format(i + 1, len(res.F)))
         # print("\t\t time: ",(ettime-sttime))
