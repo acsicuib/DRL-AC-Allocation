@@ -66,16 +66,16 @@ def main():
         
         ettime = datetime.now().replace(microsecond=0)
 
-        print(res.X)
-        print(res.X.shape)
+        # print(res.X)
+        # print(res.X.shape)
         
         try:
             log_pf = []
             for ix,pf in enumerate(res.X):
-                if len(res.X.shape)>2:
-                    solution = problem.myevaluate(res.X[ix])
-                else:
+                if res.X.shape[0]==40500:
                     solution = problem.myevaluate(res.X)
+                else:
+                    solution = problem.myevaluate(res.X[ix])
 
                 log_pf.append([i,solution[0],solution[1],solution[2],(ettime-sttime)])
 
@@ -86,7 +86,7 @@ def main():
                 
         print('\tEpisode {}\t Len PF: {}\t'.format(i + 1, len(res.F)))
         # print("\t\t time: ",(ettime-sttime))
-        # break
+        break
         
 
 if __name__ == '__main__':

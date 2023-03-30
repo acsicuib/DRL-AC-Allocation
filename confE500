@@ -42,9 +42,9 @@ scp isaac@cloudlab:~/projects/DRL-AC-Allocation/logs/log_ga_pf_E500_9_499_0.pkl 
 
 #### EVAL NSGA MONO
 
-nohup python -u "eval_nsgaII_mono.py" --name E500 --n_devices 499 --n_jobs 9 --n_gen 100 --rewardWeightCost 0.5 --rewardWeightTime 0.5 > fM.out 2> feM.err < /dev/null &
+nohup python -u "eval_nsgaII_mono.py" --name E500 --n_devices 499 --n_jobs 9 --n_gen 10 --rewardWeightCost 0.5 --rewardWeightTime 0.5 > fM.out 2> feM.err < /dev/null &
 
-63928
+67574
 
 
 

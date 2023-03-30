@@ -60,7 +60,7 @@ def main():
         for pf in res.F:
             log_pf.append([i,pf[0],pf[1],(ettime-sttime)])
 
-        with open('logs/log_ga_pf__mono_'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'_%i.pkl'%i, 'wb') as f:
+        with open('logs/log_ga_pf_'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'_%i.pkl'%i, 'wb') as f:
                 pickle.dump(log_pf, f)
                 
         print('\tEpisode {}\t Len PF: {}\t'.format(i + 1, len(res.F)))
