@@ -71,8 +71,7 @@ def main():
         
         try:
             log_pf = []
-            for ix,pf in enumerate(res.F):
-                
+            for ix,pf in enumerate(res.X):
                 if len(res.X.shape)>2:
                     
                     solution = problem.myevaluate(res.X[ix])
