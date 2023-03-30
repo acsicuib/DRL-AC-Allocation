@@ -43,7 +43,7 @@ def main():
     termination = get_termination("n_gen", configs.n_gen)
 
     for i, sample  in enumerate(data):
-        if i == 0: continue
+        # if i == 0: continue
         print("Running episode: %i"%(i+1))
         times, adj, feat = sample
         problem = MonoPlacementProblem(n_var=(configs.n_devices+1)*configs.n_tasks,
