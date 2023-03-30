@@ -22,5 +22,5 @@ with open('datasets/dt_%s_%s_%i_%i.npz'%(CASE,configs.name,configs.n_jobs,config
     
     np.savez(f,times=times,adj=adj,feat=feat)
         
-
+print("Done")
 
