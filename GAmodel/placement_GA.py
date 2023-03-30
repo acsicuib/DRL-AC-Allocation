@@ -61,6 +61,8 @@ class MonoPlacementProblem(ElementwiseProblem):
         out["G"] = [g1]
     
     def myevaluate(self, x):
+        print("devices, ",self.number_devices)
+        
         sample = x.reshape(self.number_devices,self.n_tasks)
         f1 = np.sum(getCNTimes(sample,self.executions,self.featHW,self.adj))
         f2 = np.sum(getCNCosts(sample,self.featHW))

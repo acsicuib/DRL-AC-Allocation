@@ -33,7 +33,7 @@ def main():
                      ))
     
     algorithm = NSGA2(
-        pop_size=200,
+        pop_size=100,
         sampling=MySampling(),
         crossover=BinaryCrossover(prob_mutation=.15), #TODO remove prob_mutation !!BUG?
         mutation=MyMutation(prob=.0), #TODO fix prob
@@ -67,11 +67,13 @@ def main():
         ettime = datetime.now().replace(microsecond=0)
 
         print(res.X)
+        print(res.X.shape)
         
 
         log_pf = []
         for ix,pf in enumerate(res.F):
             if len(res.X.shape)>2:
+                
                 solution = problem.myevaluate(res.X[ix])
             else:
                 solution = problem.myevaluate(res.X)
