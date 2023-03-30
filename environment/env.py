@@ -164,7 +164,7 @@ class SPP(gym.Env, EzPickle): #Service Placement Problem
             featureDevices[:,col] /= np.abs(featureDevices[:,col]).max()
 
         # Reward
-        reward = - (configs.rewardWeightTime*(np.sum(self.LBs) - self.max_endTime) + ((configs.rewardWeightCost/3)*(np.sum(self.Costs)-self.max_endCost)))
+        reward = - (configs.rewardWeightTime*(np.sum(self.LBs) - self.max_endTime) + ((configs.rewardWeightCost)*(np.sum(self.Costs)-self.max_endCost)))
         if reward == 0: 
             reward = configs.rewardscale #same action/state as the initial maximum
             self.posRewards += reward
