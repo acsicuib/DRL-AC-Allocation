@@ -25,7 +25,7 @@ def main():
 
     weigthRange = list(np.arange(0,11,2.5))
     combinationsWeightTC = list(zip(weigthRange,weigthRange[::-1])) #[(0, 10), (1, 9), (2, 8), (3, 7), (4, 6), (5, 5), (6, 4), (7, 3), (8, 2), (9, 1), (10, 0)]
-    # combinationsWeightTC = [(0.0, 10.0), (2.5, 7.5), (5.0, 5.0), (7.5, 2.5)]
+    combinationsWeightTC = [(0.0, 10.0), (2.5, 7.5), (5.0, 5.0)]
     # combinationsWeightTC = [(0.0, 10.0), (2.5, 7.5), (5.0, 5.0), (7.5, 2.5), (10.0, 0.0)]
     print(combinationsWeightTC)
     # sys.exit()

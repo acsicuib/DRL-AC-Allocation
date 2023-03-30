@@ -8,6 +8,10 @@ parser = argparse.ArgumentParser(description='Arguments')
 parser.add_argument('--name', type=str, default="default", help='Case study name to record results')
 parser.add_argument('--record_ppo', type=bool, default=True, help='Record log of PPO evolution loss values per episode')
 
+### Dataset generation
+parser.add_argument('--typeDS', type=str, default="TEST", help='TEST or VALIDATION')
+
+
 ### Environment parameters
 parser.add_argument('--rewardscale', type=int, default=0, help='Reward increment/decrement in actions with same behaviour in St > St+1')
 parser.add_argument('--et_normalize_coef', type=int, default=1000, help='Coeficient factor to normalize application execution time')
@@ -40,11 +44,11 @@ parser.add_argument('--task_time_high', type=int, default=9, help='Maximun range
 
 ### Device args
 # parser.add_argument('--latency_options', nargs='+', type=int, default=[1,5,10,15,20,25,30], help="A sequence of intergers. Latency values for device generation. Smaller better.")
-parser.add_argument('--latency_options', nargs='+', type=int, default=[1,5,10,15,20,25,30,35], help="A sequence of intergers. Latency values for device generation. Smaller better.")
+parser.add_argument('--latency_options', nargs='+', type=int, default=[1,5,10,15,20,25,30,35], help="A sequence of intergers. Latency values for device generation. Smaller better. Same len - cost options")
 # parser.add_argument('--cpu_speed_options', nargs='+', type=int, default=[2,4,6], help="A sequence of intergers. CPU speed values for device generation. Bigger better.")
 parser.add_argument('--cpu_speed_options', nargs='+', type=int, default=[4], help="A sequence of intergers. CPU speed values for device generation. Bigger better.")
 # parser.add_argument('--cost_options', nargs='+', type=int, default=[1,5,10,15,20], help="A sequence of intergers. Cost values for device generation. Smaller better.")
-parser.add_argument('--cost_options', nargs='+', type=int, default=[5,10,15,20,25,30,35], help="A sequence of intergers. Cost values for device generation. Smaller better.")
+parser.add_argument('--cost_options', nargs='+', type=int, default=[1,5,10,15,20,25,30,35], help="A sequence of intergers. Cost values for device generation. Smaller better. Same len - latency options")
 ### Feature Cloud-entity
 # parser.add_argument('--cloud_features', nargs='+', type=int, default=[10,10,30,0], help="Cloud entity features: %s"%feature_labels)
 parser.add_argument('--cloud_features', nargs='+', type=int, default=[4,20,35,0], help="Cloud entity features: %s"%feature_labels)
