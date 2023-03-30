@@ -73,12 +73,11 @@ def main():
             log_pf = []
             for ix,pf in enumerate(res.X):
                 if len(res.X.shape)>2:
-                    
                     solution = problem.myevaluate(res.X[ix])
                 else:
                     solution = problem.myevaluate(res.X)
 
-                log_pf.append([i,pf,solution[0],solution[1],solution[2],(ettime-sttime)])
+                log_pf.append([i,solution[0],solution[1],solution[2],(ettime-sttime)])
 
             with open('logs/log_ga_pf_mono_'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'_%i.pkl'%i, 'wb') as f:
                     pickle.dump(log_pf, f)
