@@ -40,6 +40,7 @@ def main():
         eliminate_duplicates=True
     )
 
+    codeW = str(int(configs.rewardWeightTime*100))+str(int(configs.rewardWeightCost*100))
     termination = get_termination("n_gen", configs.n_gen)
 
     for i, sample  in enumerate(data):
@@ -81,7 +82,7 @@ def main():
 
                 log_pf.append([i,solution[0],solution[1],solution[2],(ettime-sttime)])
 
-            with open('logs/log_ga_pf_mono_'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'_%i.pkl'%i, 'wb') as f:
+            with open('logs/log_ga_pf_mono_'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'_%i_w%s.pkl'%(i,codeW), 'wb') as f:
                     pickle.dump(log_pf, f)
         except:
             print("Problem with CASE %i"%i)
