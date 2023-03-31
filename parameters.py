@@ -99,6 +99,8 @@ parser.add_argument('--decayflag', type=bool, default=False, help='Apply decay s
 ### GA - comparative
 # parser.add_argument('--ref_point', nargs='+', type=float, default=[200., 180.], help="Reference point for Hypervolumen computation")
 parser.add_argument('--n_gen',  type=int, default= 100, help="Number of generations")
+parser.add_argument('--norm_cost',  type=float, default= 3000.0, help="Max value for normalization in mono GA")
+parser.add_argument('--norm_time',  type=float, default= 2000.0, help="Max value for normalization in mono GA")
 
 # Transforms arguments to a global variable
 configs = parser.parse_args()
