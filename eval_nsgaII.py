@@ -34,8 +34,8 @@ def main():
 
     termination = get_termination("n_gen", configs.n_gen)
 
-    # for i, sample  in enumerate(data):
-    for i, sample  in enumerate(range(3)):
+    for i, sample  in enumerate(data):
+        if i == 3: break
         
         print("Running episode: %i"%(i+1))
         times, adj, feat = sample

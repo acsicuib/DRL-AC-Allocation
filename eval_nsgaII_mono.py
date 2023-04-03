@@ -43,9 +43,9 @@ def main():
     codeW = str(int(configs.rewardWeightTime*100))+str(int(configs.rewardWeightCost*100))
     termination = get_termination("n_gen", configs.n_gen)
 
-    for i, sample  in enumerate(range(3)):
+    for i, sample  in enumerate(data):
     # for i, sample  in enumerate(data):
-        # if i == 0: continue
+        if i == 3: break
         print("Running episode: %i"%(i+1))
         times, adj, feat = sample
         problem = MonoPlacementProblem(n_var=(configs.n_devices+1)*configs.n_tasks,
