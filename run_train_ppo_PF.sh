@@ -1,0 +1,5 @@
+nohup python -u "train_ppo.py" --name E100 --n_devices 99 --n_jobs 3 --max_updates 150 --device cuda > fp55.out 2> fp55.err < /dev/null &&
+nohup python -u "train_ppo.py" --name E100 --n_devices 99 --n_jobs 3 --max_updates 150 --device cpu --rewardWeightCost 1.0 --rewardWeightTime 0.0 --device cuda --record_alloc_episodes 0 10 20 30  > fp01.out 2> fp01.err < /dev/null &&
+nohup python -u "train_ppo.py" --name E100 --n_devices 99 --n_jobs 3 --max_updates 100 --device cpu --rewardWeightCost 0.0 --rewardWeightTime 1.0 --device cuda --record_alloc_episodes 0 10 20 30 40 > fp10.out 2> fp10.err < /dev/null &&
+nohup python -u "train_ppo.py" --name E100 --n_devices 99 --n_jobs 3 --max_updates 150 --device cpu --rewardWeightCost 0.75 --rewardWeightTime 0.25 --device cuda > fp27.out 2> fp27.err < /dev/null &&
+nohup python -u "train_ppo.py" --name E100 --n_devices 99 --n_jobs 3 --max_updates 150 --device cpu --rewardWeightCost 0.25 --rewardWeightTime 0.75 --device cuda > fp72.out 2> fp72.err < /dev/null &

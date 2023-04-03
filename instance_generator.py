@@ -12,7 +12,8 @@ def one_instance_gen(n_jobs,n_devices,cloud_features,dependency_degree):
 
     
     ixCs = np.random.randint(0,len(configs.cost_options),n_devices)
-    ixTs = abs(ixCs-(len(configs.cost_options)-1))
+    # ixTs = abs(ixCs-(len(configs.cost_options)-1)) # Opposite values
+    ixTs = np.random.randint(0,len(configs.latency_options),n_devices)
 
     feat_Cost = np.take(configs.cost_options,ixCs)
     feat_Lat = np.take(configs.latency_options,ixTs)
@@ -34,8 +35,8 @@ def one_instance_gen(n_jobs,n_devices,cloud_features,dependency_degree):
 
 if __name__ == '__main__':
     print("Test one_instance_gen function")
-    n_jobs = 5
-    n_devices = 1000 # In total = 5+1, cloud entity
+    n_jobs = 3
+    n_devices = 15 # In total = 5+1, cloud entity
     # cloud_features = [20,10,4,0]
     cloud_features = configs.cloud_features
     degree = 0.2
