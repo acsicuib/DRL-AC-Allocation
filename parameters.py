@@ -36,7 +36,7 @@ parser.add_argument('--record_alloc_episodes', type=int, nargs='+', default=[0,1
 
 
 ### Application args
-parser.add_argument('--DAG_rand_dependencies_factor', type=float, default=0.3, help='Probability factor of a task of having a dependency with some predecesor tasks')
+parser.add_argument('--DAG_rand_dependencies_factor', type=float, default=0.2, help='Probability factor of a task of having a dependency with some predecesor tasks')
 parser.add_argument('--task_time_low',  type=int, default=8,  help='Minumun range value of the operation units of a task')
 # parser.add_argument('--task_time_low',  type=int, default=3,  help='Minumun range value of the operation units of a task')
 # parser.add_argument('--task_time_high', type=int, default=20, help='Maximun range value of the operation units of a task')
@@ -44,14 +44,16 @@ parser.add_argument('--task_time_high', type=int, default=9, help='Maximun range
 
 ### Device args
 # parser.add_argument('--latency_options', nargs='+', type=int, default=[1,5,10,15,20,25,30], help="A sequence of intergers. Latency values for device generation. Smaller better.")
-parser.add_argument('--latency_options', nargs='+', type=int, default=[1,5,10,15,20,25,30,35], help="A sequence of intergers. Latency values for device generation. Smaller better. Same len - cost options")
+parser.add_argument('--latency_options', nargs='+', type=int, default=[1,10,20,30,40,50], help="A sequence of intergers. Latency values for device generation. Smaller better. Same len - cost options")
+# parser.add_argument('--latency_options', nargs='+', type=int, default=[1,5,10,15,20,25,30,35], help="A sequence of intergers. Latency values for device generation. Smaller better. Same len - cost options")
 # parser.add_argument('--cpu_speed_options', nargs='+', type=int, default=[2,4,6], help="A sequence of intergers. CPU speed values for device generation. Bigger better.")
 parser.add_argument('--cpu_speed_options', nargs='+', type=int, default=[4], help="A sequence of intergers. CPU speed values for device generation. Bigger better.")
 # parser.add_argument('--cost_options', nargs='+', type=int, default=[1,5,10,15,20], help="A sequence of intergers. Cost values for device generation. Smaller better.")
-parser.add_argument('--cost_options', nargs='+', type=int, default=[1,5,10,15,20,25,30,35], help="A sequence of intergers. Cost values for device generation. Smaller better. Same len - latency options")
+parser.add_argument('--cost_options', nargs='+', type=int, default=[1,10,20,30,40], help="A sequence of intergers. Cost values for device generation. Smaller better. Same len - latency options")
+# parser.add_argument('--cost_options', nargs='+', type=int, default=[1,5,10,15,20,25,30,35], help="A sequence of intergers. Cost values for device generation. Smaller better. Same len - latency options")
 ### Feature Cloud-entity
 # parser.add_argument('--cloud_features', nargs='+', type=int, default=[10,10,30,0], help="Cloud entity features: %s"%feature_labels)
-parser.add_argument('--cloud_features', nargs='+', type=int, default=[4,20,35,0], help="Cloud entity features: %s"%feature_labels)
+parser.add_argument('--cloud_features', nargs='+', type=int, default=[4,20,50,0], help="Cloud entity features: %s"%feature_labels)
 
 ### Torch 
 parser.add_argument('--torch_seed', type=int, default=2022, help='Torch seed')

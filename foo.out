@@ -1,7 +1,0 @@
-TRAINING our policy: using default parameters
-Start training:  2023-03-27 09:47:42
-Policy Case:  E999_9
-	 + tasks:  81
-	 + devices:  999
-	 + episodes:  10
-	 Code: w 55

@@ -34,7 +34,8 @@ def main():
 
     termination = get_termination("n_gen", configs.n_gen)
 
-    for i, sample  in enumerate(data):
+    # for i, sample  in enumerate(data):
+    for i, sample  in enumerate(range(3)):
         
         print("Running episode: %i"%(i+1))
         times, adj, feat = sample
@@ -56,6 +57,9 @@ def main():
         
         ettime = datetime.now().replace(microsecond=0)
 
+        print(res.F)
+
+
         log_pf = []
         for pf in res.F:
             log_pf.append([i,pf[0],pf[1],(ettime-sttime)])
@@ -65,7 +69,7 @@ def main():
                 
         print('\tEpisode {}\t Len PF: {}\t'.format(i + 1, len(res.F)))
         print("\t\t time: ",(ettime-sttime))
-
+        
         
 
 if __name__ == '__main__':
