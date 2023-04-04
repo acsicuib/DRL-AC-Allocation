@@ -77,7 +77,9 @@ def main():
         try:
             log_pf = []
             for ix,pf in enumerate(res.X):
-                if res.X.shape[0]==40500:
+                if res.X.shape[0]==81000:
+                    solution = problem.myevaluate(res.X)
+                elif res.X.shape[0]==40500:
                     solution = problem.myevaluate(res.X)
                 else:
                     solution = problem.myevaluate(res.X[ix])
