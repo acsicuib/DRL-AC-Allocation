@@ -4,8 +4,8 @@ CASE="E1000v2"
 DEV=999
 JOBS=9
 
-rm *.out
-rm *.err
+rm *.out || true &&
+rm *.err || true &&
 python -u "generate_dataset.py" --name $CASE --typeDS VALIDATION --n_devices $DEV --n_jobs $JOBS --len_dataset 50 --np_seed_dataset 2023 &&
 python -u "generate_dataset.py" --name $CASE --typeDS TEST --n_devices $DEV --n_jobs $JOBS --len_dataset 30 --np_seed_dataset 1290 &&
 nohup python -u "eval_nsgaII_mono.py" --name $CASE --n_devices $DEV --n_jobs $JOBS --n_gen 100 --rewardWeightCost 0.5 --rewardWeightTime 0.5 > fM.out 2> feM.err < /dev/null &&

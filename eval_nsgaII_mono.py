@@ -70,8 +70,9 @@ def main():
         
         ettime = datetime.now().replace(microsecond=0)
 
-        # print(res.X)
-        # print(res.X.shape)
+        print(res.X)
+        print("_")
+        print(res.X.shape)
         
         try:
             log_pf = []
