@@ -70,14 +70,14 @@ def main():
         
         ettime = datetime.now().replace(microsecond=0)
 
-        print(res.X)
+        # print(res.X)
         print("_")
         print(res.X.shape)
         
         try:
             log_pf = []
             for ix,pf in enumerate(res.X):
-                if res.X.shape[0]==81000:
+                if res.X.shape[0]==configs.n_jobs*(configs.n_devices+1):
                     solution = problem.myevaluate(res.X)
                 elif res.X.shape[0]==40500:
                     solution = problem.myevaluate(res.X)
