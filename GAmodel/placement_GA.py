@@ -65,6 +65,7 @@ class MonoPlacementProblem(ElementwiseProblem):
     
     def myevaluate(self, x):
         print("MY eva X.shape ",x.shape)
+        
         print("devices, ",self.number_devices)
         print("tasks, ",self.n_tasks)
 
