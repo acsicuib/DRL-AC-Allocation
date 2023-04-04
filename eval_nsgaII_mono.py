@@ -45,7 +45,7 @@ def main():
 
     for i, sample  in enumerate(data):
     # for i, sample  in enumerate(data):
-        if i == 3: break
+        if i == 1: break
         print("Running episode: %i"%(i+1))
         times, adj, feat = sample
         problem = MonoPlacementProblem(n_var=(configs.n_devices+1)*configs.n_tasks,
@@ -88,11 +88,14 @@ def main():
 
             with open('logs/log_ga_pf_mono_'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'_%i_w%s.pkl'%(i,codeW), 'wb') as f:
                     pickle.dump(log_pf, f)
-        except:
-            print("Problem with CASE %i"%i)
+        except Exception as e: 
+            print("\tProblem with CASE %i"%i)
+            print(e)
+            print("*"*10)
                 
-        print('\tEpisode {}\t Len PF: {}\t'.format(i + 1, len(res.F)))
-        # print("\t\t time: ",(ettime-sttime))
+        print('\t ending episode {}\t Len PF: {}\t'.format(i , len(res.F)))
+        print("\t time: ",(ettime-sttime))
+        print("\t NEXT")
         # break
         
 

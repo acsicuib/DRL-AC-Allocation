@@ -16,6 +16,7 @@ import pickle as pkl
 
 device = torch.device(configs.device)
 
+time_one_sample = 0
 def main():
 
     torch.manual_seed(configs.torch_seed)
@@ -32,7 +33,7 @@ def main():
 
     ## TEST Dataset
     path_dt = 'datasets/dt_TEST_%s_%i_%i.npz'%(configs.name,configs.n_jobs,configs.n_devices)
-    # path_dt = 'datasets/dt_VALIDATION_%s_%i_%i.npz'%(configs.name,configs.n_jobs,configs.n_devices)
+    
     dataset = np.load(path_dt)
     dataset = [dataset[key] for key in dataset]
     data = []
@@ -90,6 +91,9 @@ def main():
     
 
         for i, sample  in enumerate(data):
+            if i==0 and e==0: 
+                st = time.time()
+
             times, adj, feat = sample
             alloc, state, candidate, mask = env.reset(*sample)
             state_ft = state[0]
@@ -133,6 +137,9 @@ def main():
                     ep_reward,init_reward
             ))
 
+            if i==0 and e==0: 
+                et = time.time()
+                time_one_sample = et-st
         # break
     if configs.record_alloc:
         with open('logs/log_eval_PF_'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'.pkl', 'wb') as f:
@@ -145,9 +152,12 @@ def main():
 if __name__ == '__main__':
     print("Evaluate our policy with PF models")
     start_time = datetime.now().replace(microsecond=0)
+    st = time.time()
     print("Start training: ", start_time)
     main()
     end_time = datetime.now().replace(microsecond=0)
+    et = time.time()
     print("Finish training: ", end_time)
     print("Total time: ",(end_time-start_time))
+    print("Time one sample: ",(time_one_sample))
     print("Done policy test.")
