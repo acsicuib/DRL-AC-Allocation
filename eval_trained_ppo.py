@@ -67,6 +67,7 @@ def main():
 
     log = []
     for i, sample  in enumerate(data):
+        
         times, adj, feat = sample
         alloc, state, candidate, mask = env.reset(*sample)
         state_ft = state[0]

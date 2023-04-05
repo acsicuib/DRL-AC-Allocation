@@ -29,6 +29,13 @@ class PlacementProblem(ElementwiseProblem):
        
         out["F"] = [f1,f2]
         out["G"] = [g1]
+    
+    def myevaluate(self, x):
+        sample = x.reshape(self.number_devices,self.n_tasks)
+        f1 = np.sum(getCNTimes(sample,self.executions,self.featHW,self.adj))
+        f2 = np.sum(getCNCosts(sample,self.featHW))
+        g1 = np.sum(np.abs(np.sum(sample,axis=0) - np.ones(shape=(self.n_tasks),dtype=np.uint8)))
+        return [f1,f2,g1]
 
 
 class MonoPlacementProblem(ElementwiseProblem):
@@ -64,11 +71,6 @@ class MonoPlacementProblem(ElementwiseProblem):
         out["G"] = [g1]
     
     def myevaluate(self, x):
-        print("MY eva X.shape ",x.shape)
-        
-        print("devices, ",self.number_devices)
-        print("tasks, ",self.n_tasks)
-
         sample = x.reshape(self.number_devices,self.n_tasks)
         f1 = np.sum(getCNTimes(sample,self.executions,self.featHW,self.adj))
         f2 = np.sum(getCNCosts(sample,self.featHW))

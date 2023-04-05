@@ -26,8 +26,10 @@ def main():
 
     weigthRange = list(np.arange(0,11,2.5))
     combinationsWeightTC = list(zip(weigthRange,weigthRange[::-1])) #[(0, 10), (1, 9), (2, 8), (3, 7), (4, 6), (5, 5), (6, 4), (7, 3), (8, 2), (9, 1), (10, 0)]
-    # combinationsWeightTC = [(0.0, 10.0), (2.5, 7.5), (5.0, 5.0)]
     # combinationsWeightTC = [(0.0, 10.0), (2.5, 7.5), (5.0, 5.0), (7.5, 2.5), (10.0, 0.0)]
+    # combinationsWeightTC = [(0.0, 10.0), (2.5, 7.5), (5.0, 5.0)]
+    # combinationsWeightTC = [(5.0, 5.0)]
+    
     print(combinationsWeightTC)
     # sys.exit()
 
@@ -49,103 +51,106 @@ def main():
 
     log = []
 
-    for e,(wt,wc) in enumerate(combinationsWeightTC[::-1]):
-        configs.rewardWeightTime = wt/10.
-        configs.rewardWeightCost = wc/10.
-        print("T",configs.rewardWeightTime)
-        print("C",configs.rewardWeightCost)
-        
+    for means in range(100):
+        for e,(wt,wc) in enumerate(combinationsWeightTC[::-1]):
+            configs.rewardWeightTime = wt/10.
+            configs.rewardWeightCost = wc/10.
+            # print("T",configs.rewardWeightTime)
+            # print("C",configs.rewardWeightCost)
 
-        codeW = str(int(configs.rewardWeightTime*100))+str(int(configs.rewardWeightCost*100))
-        # codeW ="0100"
-        # configs.rewardWeightTime = 0.0
-        # configs.rewardWeightCost = 1.0
-        
-        print("Model combination: _w",codeW)
-        
-
-
-        env = SPP(number_jobs=configs.n_jobs, number_devices=configs.n_devices,number_features=number_all_device_features) 
- 
-        # initialize a PPO agent & loading the model
-        ppo_agent = PPO(env.state_dim)
-        
-        path = 'savedModels/%s_%s_%s_w%s.pth'%(str(configs.name),
-                                            str(configs.n_jobs),
-                                            str(configs.n_devices),
-                                            codeW
-                                            )
-        print(" Loading path : ",path)
-
-        if torch.cuda.is_available(): 
-            ppo_agent.policy.load_state_dict(torch.load(path)) #EXPERIMENTS FROM GPYU-server
-        else:
-            ppo_agent.policy.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
-
-        ppo_agent.fromModel()
-    
-
-        dag_pool_step = dag_pool(graph_pool_type=configs.graph_pool_type,
-                                batch_size=torch.Size([1, configs.n_tasks, configs.n_tasks]),
-                                n_nodes=configs.n_tasks, device=device)
-    
-
-        for i, sample  in enumerate(data):
-            if i==0 and e==0: 
-                st = time.time()
-
-            times, adj, feat = sample
-            alloc, state, candidate, mask = env.reset(*sample)
-            state_ft = state[0]
-            state_fm = state[1]
-            init_reward = - env.getRewardInit()
-            ep_reward = - env.getRewardInit()
-            init_time = env.max_endTime
-            init_cost = env.max_endCost 
-            while True:
-
-                adj_tensor_env = torch.from_numpy(adj).to(device).to_sparse()
-                state_ft_tensor_env = torch.from_numpy(state_ft).to(device) 
-                state_fm_tensor_env = torch.from_numpy(state_fm).to(device)
-                candidate_tensor_env = torch.from_numpy(candidate).to(device)
-                mask_tensor_env = torch.from_numpy(mask).to(device)
-                
-                with torch.no_grad():
-                    task_action, _, _, _, _, ix_machine_action, _, _, _ = ppo_agent.policy(
-                                                                state_ft=state_ft_tensor_env,
-                                                                state_fm=state_fm_tensor_env.unsqueeze(0),
-                                                                candidate=candidate_tensor_env.unsqueeze(0),
-                                                                mask=mask_tensor_env.unsqueeze(0),
-                                                                adj=adj_tensor_env,
-                                                                graph_pool=dag_pool_step)
-                    
-
-                alloc, state, reward, done, candidate, mask = env.step(task=int(task_action),
-                                                                            device=int(ix_machine_action))
-                ep_reward += reward  
-
-                if done: 
-                    break
+            codeW = str(int(configs.rewardWeightTime*100))+str(int(configs.rewardWeightCost*100))
+            # codeW ="0100"
+            # configs.rewardWeightTime = 0.0
+            # configs.rewardWeightCost = 1.0
+            
+            print("Model combination: _w",codeW)
             
 
-            log.append([codeW, i, env.max_endTime,env.max_endCost,ep_reward,init_time,init_cost])
-            print('Model: %s\t Sample %i\tTime: %0.2f || %0.2f\t Cost: %.2f || %0.2f \t Reward: %.2f/%.2f'%(
-                    codeW,
-                    i + 1,
-                    init_time, env.max_endTime, 
-                    init_cost, env.max_endCost,
-                    ep_reward,init_reward
-            ))
 
-            if i==0 and e==0: 
+            env = SPP(number_jobs=configs.n_jobs, number_devices=configs.n_devices,number_features=number_all_device_features) 
+    
+            # initialize a PPO agent & loading the model
+            ppo_agent = PPO(env.state_dim)
+            
+            path = 'savedModels/%s_%s_%s_w%s.pth'%(str(configs.name),
+                                                str(configs.n_jobs),
+                                                str(configs.n_devices),
+                                                codeW
+                                                )
+            print(" Loading path : ",path)
+
+            if torch.cuda.is_available(): 
+                ppo_agent.policy.load_state_dict(torch.load(path)) #EXPERIMENTS FROM GPYU-server
+            else:
+                ppo_agent.policy.load_state_dict(torch.load(path, map_location=torch.device('cpu')))
+
+            ppo_agent.fromModel()
+        
+
+            dag_pool_step = dag_pool(graph_pool_type=configs.graph_pool_type,
+                                    batch_size=torch.Size([1, configs.n_tasks, configs.n_tasks]),
+                                    n_nodes=configs.n_tasks, device=device)
+        
+
+            for i, sample  in enumerate(data):
+                if i == 1: break #NOTE We only use a sample 
+                
+                st = time.time()
+
+                times, adj, feat = sample
+                alloc, state, candidate, mask = env.reset(*sample)
+                state_ft = state[0]
+                state_fm = state[1]
+                init_reward = - env.getRewardInit()
+                ep_reward = - env.getRewardInit()
+                init_time = env.max_endTime
+                init_cost = env.max_endCost 
+                while True:
+
+                    adj_tensor_env = torch.from_numpy(adj).to(device).to_sparse()
+                    state_ft_tensor_env = torch.from_numpy(state_ft).to(device) 
+                    state_fm_tensor_env = torch.from_numpy(state_fm).to(device)
+                    candidate_tensor_env = torch.from_numpy(candidate).to(device)
+                    mask_tensor_env = torch.from_numpy(mask).to(device)
+                    
+                    with torch.no_grad():
+                        task_action, _, _, _, _, ix_machine_action, _, _, _ = ppo_agent.policy(
+                                                                    state_ft=state_ft_tensor_env,
+                                                                    state_fm=state_fm_tensor_env.unsqueeze(0),
+                                                                    candidate=candidate_tensor_env.unsqueeze(0),
+                                                                    mask=mask_tensor_env.unsqueeze(0),
+                                                                    adj=adj_tensor_env,
+                                                                    graph_pool=dag_pool_step)
+                        
+
+                    alloc, state, reward, done, candidate, mask = env.step(task=int(task_action),
+                                                                                device=int(ix_machine_action))
+                    ep_reward += reward  
+
+                    if done: 
+                        break
+                
                 et = time.time()
-                time_one_sample = et-st
-        # break
+                exec_time = et-st
+
+                log.append([codeW, i, env.max_endTime,env.max_endCost,ep_reward,init_time,init_cost,exec_time])
+                print('Model: %s\t Sample %i\tTime: %0.2f || %0.2f\t Cost: %.2f || %0.2f \t Reward: %.2f/%.2f  - E.Time: %.2f'%(
+                        codeW,
+                        i + 1,
+                        init_time, env.max_endTime, 
+                        init_cost, env.max_endCost,
+                        ep_reward,init_reward,
+                        exec_time
+                ))
+
+            
+            # break
+    
     if configs.record_alloc:
         with open('logs/log_eval_PF_'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'.pkl', 'wb') as f:
             pickle.dump(log, f)
     
-    
+
     print("Done\n")
 
 
@@ -159,5 +164,4 @@ if __name__ == '__main__':
     et = time.time()
     print("Finish training: ", end_time)
     print("Total time: ",(end_time-start_time))
-    print("Time one sample: ",(time_one_sample))
     print("Done policy test.")

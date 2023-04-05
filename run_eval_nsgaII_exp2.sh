@@ -15,6 +15,6 @@ python -u "generate_dataset.py" --name $CASE2 --typeDS TEST --n_devices $DEV2 --
 nohup python -u "eval_nsgaII_mono.py" --name $CASE --n_devices $DEV --n_jobs $JOBS --n_gen 100 --rewardWeightCost 0.5 --rewardWeightTime 0.5 > fM_1500.out 2> feM.err < /dev/null &&
 nohup python -u "eval_nsgaII_mono.py" --name $CASE2 --n_devices $DEV2 --n_jobs $JOBS2 --n_gen 100 --rewardWeightCost 0.5 --rewardWeightTime 0.5 > fM_2000.out 2> feM.err < /dev/null &&
 touch DONE_PF.out &&
-nohup python -u "eval_nsgaII.py" --name $CASE --n_devices $DEV --n_jobs $JOBS --n_gen 100 > fPF.out 2> fPF.err < /dev/null &&
-nohup python -u "eval_nsgaII.py" --name $CASE2 --n_devices $DEV2 --n_jobs $JOBS2 --n_gen 100 > fPF.out 2> fPF.err < /dev/null &&
+nohup python -u "eval_nsgaII.py" --name $CASE --n_devices $DEV --n_jobs $JOBS --n_gen 100 > fPF_1500.out 2> fPF.err < /dev/null &&
+nohup python -u "eval_nsgaII.py" --name $CASE2 --n_devices $DEV2 --n_jobs $JOBS2 --n_gen 100 > fPF_2000.out 2> fPF.err < /dev/null &&
 touch DONE.out &
