@@ -8,18 +8,22 @@ from GAmodel.placement_GA import MyMutation,MySampling,MonoPlacementProblem,Bina
 import pickle
 from datetime import datetime
 
+import sys
 from pymoo.config import Config
 Config.warnings['not_compiled'] = False
+
 
 def main():
     np.random.seed(configs.np_seed_train)
     
-    ## DEBUG
+    # ## DEBUG
     # configs.name ="E999_9"
     # configs.n_devices = 999
     # configs.n_jobs = 9
     # configs.n_tasks = 81
     # configs.n_gen = 4
+    # ###
+
 
 
     path_dt = 'datasets/dt_TEST_%s_%i_%i.npz'%(configs.name,configs.n_jobs,configs.n_devices)
@@ -37,7 +41,8 @@ def main():
         sampling=MySampling(),
         crossover=BinaryCrossover(prob_mutation=.15), #TODO remove prob_mutation !!BUG?
         mutation=MyMutation(prob=.0), #TODO fix prob
-        eliminate_duplicates=True
+        eliminate_duplicates=True,
+        save_history = True
     )
 
     codeW = str(int(configs.rewardWeightTime*100))+str(int(configs.rewardWeightCost*100))
@@ -71,25 +76,36 @@ def main():
         ettime = datetime.now().replace(microsecond=0)
 
         # print(res.X)
-        print("_")
-        print(res.X.shape)
+        # print("_")
+        # print(res.X.shape)
         
+
+
+        # print("History")
+        convergence = [res.history[i].result().f for i in range(len(res.history))]
+        exec_time = [res.history[i].result().exec_time for i in range(len(res.history))]
+        ct = zip(convergence,exec_time)
+        # print(ct)
+        with open('logs/log_ga_mono_convergence'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'_%i_w%s.pkl'%(i,codeW), 'wb') as f:
+                    pickle.dump(ct, f)
+        # print(convergence)
+
+        # sys.exit()
         try:
             log_pf = []
             for ix,pf in enumerate(res.X):
                 if res.X.shape[0]==configs.n_tasks*(configs.n_devices+1):
-                    print("A")
+                    # print("A")
                     solution = problem.myevaluate(res.X)
-                    
                 elif res.X.shape[0]==40500:
                     solution = problem.myevaluate(res.X)
                 else:
-                    print("C")
+                    # print("C")
                     solution = problem.myevaluate(res.X[ix])
 
                 log_pf.append([i,solution[0],solution[1],solution[2],(ettime-sttime)])
 
-            with open('logs/log_ga_pf_mono_'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'_%i_w%s.pkl'%(i,codeW), 'wb') as f:
+            with open('logs/log_ga_mono_'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'_%i_w%s.pkl'%(i,codeW), 'wb') as f:
                     pickle.dump(log_pf, f)
         except Exception as e: 
             print("\tProblem with CASE %i"%i)
@@ -103,7 +119,7 @@ def main():
         
 
 if __name__ == '__main__':
-    print("NSGAII-MONO-strategy test: using default parameters")
+    print("NSGAII-MONO-strategy")
     start_time = datetime.now().replace(microsecond=0)
     print("Started training: ", start_time)
     print("="*30)

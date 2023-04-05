@@ -14,6 +14,14 @@ Config.warnings['not_compiled'] = False
 def main():
     np.random.seed(configs.np_seed_train)
     
+    # ## DEBUG
+    # configs.name ="E999_9"
+    # configs.n_devices = 999
+    # configs.n_jobs = 9
+    # configs.n_tasks = 81
+    # configs.n_gen = 4
+    # ###
+
     path_dt = 'datasets/dt_TEST_%s_%i_%i.npz'%(configs.name,configs.n_jobs,configs.n_devices)
     dataset = np.load(path_dt)
     dataset = [dataset[key] for key in dataset]
@@ -29,13 +37,14 @@ def main():
         sampling=MySampling(),
         crossover=BinaryCrossover(prob_mutation=.15), #TODO remove prob_mutation !!BUG?
         mutation=MyMutation(prob=.0), #TODO fix prob
-        eliminate_duplicates=True
+        eliminate_duplicates=True,
+        save_history = True
     )
 
     termination = get_termination("n_gen", configs.n_gen)
 
     for i, sample  in enumerate(data):
-        if i == 3: break
+        if i == 1: break
         
         print("Running episode: %i"%(i+1))
         times, adj, feat = sample
@@ -57,7 +66,14 @@ def main():
         
         ettime = datetime.now().replace(microsecond=0)
 
-        print(res.F)
+        # print(res.F)
+
+        convergence = [res.history[i].result().f for i in range(len(res.history))]
+        exec_time = [res.history[i].result().exec_time for i in range(len(res.history))]
+        ct = zip(convergence,exec_time)
+        # print(ct)
+        with open('logs/log_ga_pf_convergence'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'_%i.pkl'%i, 'wb') as f:
+                    pickle.dump(ct, f)
 
 
         log_pf = []
@@ -73,7 +89,7 @@ def main():
         
 
 if __name__ == '__main__':
-    print("NSGAII-strategy test: using default parameters")
+    print("NSGAII-strategy")
     start_time = datetime.now().replace(microsecond=0)
     print("Started training: ", start_time)
     print("="*30)
