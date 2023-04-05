@@ -109,4 +109,4 @@ python -u "generate_dataset.py" --name $CASE --typeDS TEST --n_devices $DEV --n_
 nohup python -u "eval_nsgaII_mono.py" --name $CASE --n_devices $DEV --n_jobs $JOBS --n_gen 100 --rewardWeightCost 0.5 --rewardWeightTime 0.5 > out/fa_$CASE.out 2> out/fa.err < /dev/null &&
 touch out/DONE__$CASE.out &&
 nohup python -u "eval_nsgaII.py" --name $CASE --n_devices $DEV --n_jobs $JOBS --n_gen 100 > out/fPF_$CASE.out 2> out/fPF.err < /dev/null &&
-touch out/DONE2__$CASE.out &&
+touch out/DONE2__$CASE.out &
