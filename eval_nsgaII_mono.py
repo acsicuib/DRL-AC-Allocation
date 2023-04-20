@@ -82,15 +82,21 @@ def main():
 
 
         # print("History")
+        # n_evals = np.array([e.evaluator.n_eval for e in res.history])
+        # opt = np.array([e.opt[0].F for e in res.history])
         convergence = [res.history[i].result().f for i in range(len(res.history))]
         exec_time = [res.history[i].result().exec_time for i in range(len(res.history))]
         ct = zip(convergence,exec_time)
-        # print(ct)
+        # print(convergence)
+        # print(n_evals)
+        # print(opt)
+        # print(len(convergence))
         with open('logs/log_ga_mono_convergence'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'_%i_w%s.pkl'%(i,codeW), 'wb') as f:
                     pickle.dump(ct, f)
         # print(convergence)
 
         # sys.exit()
+        
         try:
             log_pf = []
             for ix,pf in enumerate(res.X):

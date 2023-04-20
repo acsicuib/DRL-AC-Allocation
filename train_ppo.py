@@ -1,4 +1,5 @@
 import os
+import gc
 import sys
 import glob
 import time
@@ -30,6 +31,7 @@ def main():
     torch.manual_seed(configs.torch_seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(configs.torch_seed)
+        torch.cuda.empty_cache()
     np.random.seed(configs.np_seed_train)
     
     number_all_device_features = len(configs.feature_labels) #TODO fix 
@@ -65,7 +67,8 @@ def main():
     record_reward_valid = 10000000
     
     for i_update in range(configs.max_updates):
-        
+        gc.collect()
+        torch.cuda.empty_cache() 
         #TODO clean vars -> state 
         ep_rewards = np.zeros(configs.num_envs)
         init_rewards = np.zeros(configs.num_envs)

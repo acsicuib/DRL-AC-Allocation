@@ -19,7 +19,7 @@ def main():
     # configs.n_devices = 999
     # configs.n_jobs = 9
     # configs.n_tasks = 81
-    # configs.n_gen = 4
+    # configs.n_gen = 10
     # ###
 
     path_dt = 'datasets/dt_TEST_%s_%i_%i.npz'%(configs.name,configs.n_jobs,configs.n_devices)
@@ -71,7 +71,7 @@ def main():
         convergence = [res.history[i].result().f for i in range(len(res.history))]
         exec_time = [res.history[i].result().exec_time for i in range(len(res.history))]
         ct = zip(convergence,exec_time)
-        # print(ct)
+        print(convergence)
         with open('logs/log_ga_pf_convergence'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'_%i.pkl'%i, 'wb') as f:
                     pickle.dump(ct, f)
 

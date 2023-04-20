@@ -1,4 +1,5 @@
 import os
+import gc
 import sys
 import glob
 import time
@@ -108,6 +109,8 @@ def main():
             record_reward_valid = 10000000
             
             for i_update in range(configs.max_updates):
+                gc.collect()
+                torch.cuda.empty_cache() 
                   #TODO clean vars -> state 
                 ep_rewards = np.zeros(configs.num_envs)
                 init_rewards = np.zeros(configs.num_envs)
