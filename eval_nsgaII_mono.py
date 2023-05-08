@@ -4,7 +4,7 @@ from pymoo.termination import get_termination
 from pymoo.optimize import minimize
 
 from parameters import configs
-from GAmodel.placement_GA import MyMutation,MySampling,MonoPlacementProblem,BinaryCrossover
+from GAmodel.placement_NSGA import MyMutation,MySampling,MonoPlacementProblem,BinaryCrossover
 import pickle
 from datetime import datetime
 

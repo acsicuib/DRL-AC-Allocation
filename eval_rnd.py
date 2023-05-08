@@ -101,6 +101,7 @@ def main():
         mean_rewards_all_env = ep_rewards.mean() # mean of the c-n time 
         mean_all_init_rewards =  init_rewards.mean()
         log.append([i_update, mean_rewards_all_env, mean_all_init_rewards])
+        
 
         print('Episode {}\t Last reward: {:.2f} \t Init reward: {:.2f}'.format(i_update + 1, mean_rewards_all_env, mean_all_init_rewards))
     

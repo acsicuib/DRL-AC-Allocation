@@ -36,7 +36,7 @@ def main():
     # initialize a PPO agent
     ppo_agent = PPO(env.state_dim)
     # path = 'savedModels/{}.pth'.format(str(configs.name) + "_" +str(configs.n_jobs) + '_' + str(configs.n_devices))
-    codeW = str(int(configs.rewardWeightTime*10))+str(int(configs.rewardWeightCost*10))
+    codeW = str(int(configs.rewardWeightTime*100))+str(int(configs.rewardWeightCost*100))
     path = 'savedModels/%s_%s_%s_w%s.pth'%(str(configs.name),
                                             str(configs.n_jobs),
                                             str(configs.n_devices),
@@ -114,14 +114,14 @@ def main():
 
         #TODO improve validation process
         # if (i_update + 1) % 100 == 0:#TODO
-        print(env.times)
-        print(env.opIDsOnMchs)
-        print(env.feat_copy)
-        print(env.feat_copy[97])
-        print(env.feat_copy[55])
-        break
+        # print(env.times)
+        # print(env.opIDsOnMchs)
+        # print(env.feat_copy)
+        # print(env.feat_copy[97])
+        # print(env.feat_copy[55])
+        # break
     if configs.record_alloc:
-        with open('logs/log_eval_'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'.pkl', 'wb') as f:
+        with open('logs/log_eval2_'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'.pkl', 'wb') as f:
             pickle.dump(log, f)
     
     

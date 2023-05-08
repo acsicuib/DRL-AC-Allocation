@@ -1,12 +1,14 @@
 import numpy as np
-from pymoo.core.problem import ElementwiseProblem
+from pymoo.core.problem import Problem
 from pymoo.core.crossover import Crossover
 from pymoo.core.mutation import Mutation
 from pymoo.core.sampling import Sampling
 from environment.utils import getCNTimes,getCNCosts
 
-class PlacementProblemMOEAD(ElementwiseProblem):
-    def __init__(self,n_var,n_objectives,time,adj,featHW,n_devices,n_tasks,wTime,wCost):
+
+
+class GAPlacementProblem(Problem):
+    def __init__(self,n_var,n_objectives,time,adj,featHW,n_devices,n_tasks,pop_size,wTime,wCost,ratioRule,norm_time,norm_cost):
         super().__init__(
             n_var = n_var,
             n_obj=n_objectives,
@@ -17,24 +19,45 @@ class PlacementProblemMOEAD(ElementwiseProblem):
 
         self.wTime = wTime
         self.wCost = wCost
+        self.xl = 0.0
+        self.xu = 3000.0
+        self.normTime = norm_time
+        self.normCost = norm_cost
 
-
+        self.pop_size =pop_size
         ## One Infraestructure, and one App
         self.executions = time
         self.adj = adj
         self.featHW = featHW
+        self.ratioRule = ratioRule
 
     def _evaluate(self, x, out, *args, **kwargs):
+        n_samples = x.shape[0]
+        sample = x.reshape(n_samples,self.number_devices,self.n_tasks)
+        fx = []
+        gx = []
+        for i in range(len(sample)):
+            # print(sample[i,:])
+            # print("---"*10)
+            f1 = np.sum(getCNTimes(sample[i,:],self.executions,self.featHW,self.adj))
+            f2 = np.sum(getCNCosts(sample[i,:],self.featHW))
+            fx.append((self.wTime*f1/self.normTime) + ((self.wCost/self.normCost)*f2))
+            gx.append(np.sum(np.abs(np.sum(sample[0,:],axis=0) - np.ones(shape=(self.n_tasks),dtype=np.uint8))))
+
+        out["F"] = [np.array(fx)]
+        out["G"] = [np.array(gx)]
+    
+    def myevaluate(self, x):
         sample = x.reshape(self.number_devices,self.n_tasks)
         f1 = np.sum(getCNTimes(sample,self.executions,self.featHW,self.adj))
         f2 = np.sum(getCNCosts(sample,self.featHW))
         fx = self.wTime*f1 + self.wCost*f2
-        # out["F"] = [fx]
-        out["F"] = [f1,f2]
-
-    def has_constraints(self):
-        return False        
+        g1 = np.sum(np.abs(np.sum(sample,axis=0) - np.ones(shape=(self.n_tasks),dtype=np.uint8)))
+        
+        return [f1,f2,g1]
     
+       
+        
 class MySampling(Sampling):
 
     

@@ -146,9 +146,9 @@ def main():
             
             # break
     
-    if configs.record_alloc:
-        with open('logs/log_eval_PF_'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'.pkl', 'wb') as f:
-            pickle.dump(log, f)
+    # if configs.record_alloc:
+    with open('logs/log_eval_PF_'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'.pkl', 'wb') as f:
+        pickle.dump(log, f)
     
 
     print("Done\n")

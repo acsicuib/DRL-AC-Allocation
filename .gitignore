@@ -15,3 +15,7 @@ CONFIGURACIONES.txt
 savedModels/*
 .vscode
 results/*
+out/
+out2/
+results/
+images/

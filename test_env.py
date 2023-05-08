@@ -6,7 +6,7 @@ import time
 
 
 def main():
-    SEED = 2023
+    SEED = 20238
     np.random.seed(SEED)
 
     n_jobs = configs.n_jobs 
@@ -14,7 +14,8 @@ def main():
     n_features = len(configs.feature_labels)
 
     times, adj, feat = one_instance_gen(n_jobs,n_devices,configs.cloud_features,configs.DAG_rand_dependencies_factor)
-    print("HW features: ",feat)
+    print("HW features: ")
+    print(configs.feature_labels)
     print(feat)
 
     t1 = time.time()
@@ -55,9 +56,10 @@ def main():
         ix_job = np.random.choice(len(omega[~mask]))
         candidate_task = omega[~mask][ix_job]
         print("Candidate_job: ",candidate_task)
-        device = env.selectRndDevice()
+        # device = env.selectRndDevice()
         # device = env.selectBestCostDevice()
         # device = env.selectBestLatencyDevice()
+        device = env.selectCloudDevice()
         print('Action:', device)
 
         alloc, (state_t,state_m), reward, done, omega, mask = env.step(candidate_task,device)

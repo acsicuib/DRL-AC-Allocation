@@ -31,6 +31,7 @@ def main():
         mask_envs = []
         
         logAlloc = []
+        machine = []
         # Init all the environments
         for i, env in enumerate(envs):
             _, _, candidate, mask = env.reset(*one_instance_gen(n_jobs=configs.n_jobs, n_devices=configs.n_devices,cloud_features=configs.cloud_features, dependency_degree=configs.DAG_rand_dependencies_factor))
@@ -40,6 +41,12 @@ def main():
             ep_rewards[i] = - env.initQuality
             # print("\tR%i: %f "%(0,ep_rewards[i]))
             init_rewards[i] = - env.initQuality
+            # machine.append(env.selectDevicePriorizingLat())
+            # machine.append(env.selectDevicePriorizingCost())
+            machine.append(env.selectDevicePriorizingLat())
+            
+            
+        print(machine)
 
         steps = 0
         while True:
@@ -50,13 +57,12 @@ def main():
                 # V0. select rnd action. Version amigable
                 ix_job = np.random.choice(len(candidate_envs[i][~mask_envs[i]]))
                 candidate_task = candidate_envs[i][~mask_envs[i]][ix_job]
-                machine = envs[i].selectBestLatencyDevice()
-    
+                device = machine[i]
+                
                 # V1. 1º Cualquiera sin los candidatos y posteriormente aplicando candidatos (modelo ppo_train.py)  # V1. 1º Cualquier sin los candidatos 
                 ### NO FUNCIONA - hay que aplicar el candidate
                 # action = np.random.randint(0,envs[i].action_dim)
-
-                action_envs.append((candidate_task,machine))
+                action_envs.append((candidate_task,device))
 
             candidate_envs = []
             mask_envs = []
@@ -103,11 +109,11 @@ def main():
     
 
     if configs.record_ppo:
-        with open('logs/log_edge_'  + str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'.pkl', 'wb') as f:
+        with open('logs/log_edge2_'  + str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'.pkl', 'wb') as f:
             pickle.dump(log, f)
         
     if configs.record_alloc:
-        with open('logs/log_edge_alloc_'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'.pkl', 'wb') as f:
+        with open('logs/log_edge_alloc_PCost'+ str(configs.name) + "_" + str(configs.n_jobs) + '_' + str(configs.n_devices)+'.pkl', 'wb') as f:
             pickle.dump(logAlloc, f)
 
 

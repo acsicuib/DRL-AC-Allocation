@@ -103,6 +103,9 @@ class SPP(gym.Env, EzPickle): #Service Placement Problem
         rnd_device = np.random.randint(0,self.number_devices)
         return rnd_device#*self.number_tasks+candidate
 
+    def selectCloudDevice(self):
+        return self.number_devices-1
+    
 
     def selectBestLatencyDevice(self):
         #TODO improve selection of columns: value=2
@@ -113,6 +116,23 @@ class SPP(gym.Env, EzPickle): #Service Placement Problem
         #TODO improve selection of columns: value=2
         device_lowest_cost = self.feat_copy[:,1].argmin() # gets the lowest latency device
         return device_lowest_cost
+    
+    def selectDevicePriorizingLat(self):
+        #TODO improve selection of columns: value=2
+        lowLatencyValue = self.feat_copy[:,2].min() # gets the lowest latency device
+        devices = self.feat_copy[self.feat_copy[:,2]==lowLatencyValue]
+        device_lowest_cost = devices[:,1].argmin()
+        result = np.where(np.all(self.feat_copy == devices[device_lowest_cost],axis=1))[0][0]
+        return result
+
+    def selectDevicePriorizingCost(self):
+        #TODO improve selection of columns: value=2
+        costValue = self.feat_copy[:,1].min() # gets the lowest latency device
+        devices = self.feat_copy[self.feat_copy[:,1]==costValue]
+        device_lowest_lat = devices[:,2].argmin()
+        result = np.where(np.all(self.feat_copy == devices[device_lowest_lat],axis=1))[0][0]
+        return result
+    
 
     def getRewardInit(self):
         return configs.rewardWeightTime*(self.max_endTime) + configs.rewardWeightCost*(self.max_endCost)
