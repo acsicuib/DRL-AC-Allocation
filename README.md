@@ -1,6 +1,12 @@
-# Project: Deep Reinformcent Learning - Actor Critic Policy - for Allocation Problem (DRL-AC-Allocation)
+# Project: Multi-objective optimization problem of application placement in the cloud continuum
 
-Multi-objective Optimization in Fog Placement Problem with Deep Reinforcement Learning
+This project is focused to solve a multi-objective optimization problem of application placement in the cloud continuum using a deep reinforcement learning (DRL) approach. Unlike other optimization techniques such as ILP or evolutionary algorithms, DRL models can be applied in real-time to solve similar problem situations after being trained. 
+
+Our multi-objective model is composed of a learning process that involves a graph neural network and two actor-critics to have a holistic view of the priorities in terms of interconnected services that compose an application and a scalar problem decomposition process to compute the dominant solutions for each objective. 
+
+The learning model considers the relationships between services as a key factor when selecting their placement: services with higher dependencies should have priority when choosing their locations. The scalar decomposition involves training multiple models according to the balance of the objectives pursued in the problem.
+
+The project contains complementary experimentation with baseline strategies and with a single-objective GA and a multi-objective such as NSGA-II.
 
 This repository contains the code presented on this published paper:
 
